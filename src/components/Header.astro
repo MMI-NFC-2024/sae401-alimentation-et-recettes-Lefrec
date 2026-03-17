@@ -22,6 +22,12 @@ import Bird from "../assets/svg/big-bird.svg";
       <div></div>
     </button>
   </div>
+  <!-- overlay (click to close) -->
+  <div
+    id="sidebarOverlay"
+    class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300"
+  >
+  </div>
   <!-- sidebar -->
   <div
     id="sidebar"
@@ -60,19 +66,23 @@ import Bird from "../assets/svg/big-bird.svg";
     </div>
     <!-- connection -->
     <div class="centerflex flex-col">
-      <div class="centerflex p-2.5 rounded-3xl bg-gold">
+      <div
+        class="centerflex p-2.5 rounded-3xl bg-gold hover:scale-105 transition-transform duration-100 ease-in-out"
+      >
         <a class="text-light text-lg font-semibold" href="/">Connexion</a>
       </div>
-      <a class="text-not-so-dark text-base font-medium" href="/">Créer un compte</a>
+      <a class="text-not-so-dark text-base font-medium hover:underline" href="/"
+        >Créer un compte</a
+      >
     </div>
     <!-- space -->
     <div class="relative h-full">
-        <Bird class="absolute right-0 bottom-0"/>
+      <Bird class="absolute right-0 bottom-0" />
     </div>
     <!-- store -->
     <div class="centerflex p-5">
-        <App/>
-        <Play/>
+      <a href="https://www.apple.com/fr/app-store/"><App /></a>
+      <a href="https://play.google.com/store/apps?hl=fr"><Play /></a>
     </div>
   </div>
 </header>
@@ -82,16 +92,23 @@ import Bird from "../assets/svg/big-bird.svg";
   const openBtn = document.getElementById("open");
   const closeBtn = document.getElementById("close");
 
+  const overlay = document.getElementById("sidebarOverlay");
+
   function openSidebar() {
+    overlay?.classList.remove("opacity-0", "pointer-events-none");
+    overlay?.classList.add("opacity-100");
     sidebar?.classList.remove("translate-x-full");
     sidebar?.classList.add("translate-x-0");
   }
 
   function closeSidebar() {
+    overlay?.classList.remove("opacity-100");
+    overlay?.classList.add("opacity-0", "pointer-events-none");
     sidebar?.classList.remove("translate-x-0");
     sidebar?.classList.add("translate-x-full");
   }
 
   openBtn?.addEventListener("click", openSidebar);
   closeBtn?.addEventListener("click", closeSidebar);
+  overlay?.addEventListener("click", closeSidebar);
 </script>
