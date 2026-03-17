@@ -11,7 +11,7 @@ const { titre, theme = "recette", filledFooter = "true" } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>{titre}</title>
+    <title>Cookoo - {titre}</title>
   </head>
   <body class=`flex flex-col bg-${theme}-light bg-[url(/src/assets/svg/birds.svg)] bg-repeat bg-blend-multiply`>
     <Header/>

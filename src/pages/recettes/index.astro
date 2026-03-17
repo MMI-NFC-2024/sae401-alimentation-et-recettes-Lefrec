@@ -1,0 +1,19 @@
+---
+import Layout from "../../layout/Layout.astro";
+import Search from "../../components/Search.astro";
+import Filtres from "../../components/Filtres.astro";
+import Filtre from "../../components/Filtre.astro";
+import Pagination from "../../components/Pagination.astro";
+---
+
+<Layout titre="Nos recettes" theme="recette">
+  <div class="centerflex flex-col gap-5 px-6 pt-10 pb-4 w-full">
+    <h1>Nos recettes</h1>
+    <div class="centerflex w-full">
+      <Search />
+      <Filtres />
+    </div>
+    <Filtre content="Végétarien"/>
+    <Pagination current="1" max="4"/>
+  </div>
+</Layout>

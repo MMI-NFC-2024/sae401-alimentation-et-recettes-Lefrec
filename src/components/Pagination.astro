@@ -1,0 +1,14 @@
+---
+import Arrow from '../assets/svg/Arrow.svg';
+const { current, max, theme = "recette" } = Astro.props;
+---
+
+<div class="centerflex gap-4 p-1 rounded-full bg-light shadow-(--base-shadow)">
+    <div class="centerflex rounded-full size-9 shadow-(--inside-shadow)" class:list={(current == 1) ? "bg-not-so-dark" : `bg-${theme}-dark`}>
+        <Arrow/>
+    </div>
+    <p class="text-base text-not-so-dark">{current} sur {max}</p>
+    <div class="centerflex rounded-full size-9 shadow-(--inside-shadow)" class:list={(current == max) ? "bg-not-so-dark" : `bg-${theme}-dark`}>
+        <Arrow class="-scale-x-100"/>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+---
+import Delete from "../assets/svg/delete.svg";
+
+const { content } = Astro.props;
+---
+
+<div class="centerflex py-1 px-2 rounded-full bg-light">
+  <p class="text-not-so-dark text-base">{content}</p>
+  <Delete/>
+</div>
