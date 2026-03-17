@@ -40,6 +40,9 @@
     p {
         @apply font-common text-sm;
     }
+    input {
+        @apply outline-none;
+    }
 }
 
 @layer components {
