@@ -1,0 +1,19 @@
+---
+import "../styles/global.css";
+
+const { titre, theme = "recette" } = Astro.props;
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{titre}</title>
+  </head>
+  <body class=`bg-${theme}-light bg-[url(/src/assets/svg/birds.svg)] bg-repeat bg-blend-multiply`>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
