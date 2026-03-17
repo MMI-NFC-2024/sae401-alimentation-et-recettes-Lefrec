@@ -18,6 +18,10 @@
   --font-logo: Schoolbell, serif;
   --font-heading: Roboto Serif, serif;
   --font-common: Roboto Flex, sans-serif;
+  /* Shadow */
+  --menu-shadow: -2px 0 4px 0 rgba(0, 0, 0, 0.25);
+  --base-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  --inside-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25) inset;
 }
 
 @layer base {
@@ -35,5 +39,14 @@
     }
     p {
         @apply font-common text-sm;
+    }
+}
+
+@layer components {
+    .logo {
+        @apply font-logo text-3xl text-center;
+    }
+    .centerflex {
+        @apply flex justify-center items-center gap-2;
     }
 }
