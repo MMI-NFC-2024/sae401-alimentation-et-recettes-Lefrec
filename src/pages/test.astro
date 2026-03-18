@@ -1,5 +1,13 @@
 ---
-import { getRecette, getRecetteMinimal } from "../../backend/functions"
+import { getRecette, getRecetteMinimal, getRecettes } from "../../backend/functions"
 
-console.log(await getRecette("1us4v07h7qlry53"))
+const results = await getRecettes({
+  tags: ['Végétarien'],
+  niveau: 'débutant',
+  maxTemps: 30,
+  minNote: 3.5,
+  ingredients: ['x3dblfljnxnyhof'],
+});
+
+console.log(results)
 ---

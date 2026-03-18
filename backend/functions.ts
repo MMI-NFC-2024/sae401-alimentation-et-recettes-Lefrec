@@ -12,6 +12,29 @@ type NutritionValues = {
     fibres: number;
 };
 
+export type RecetteListItem = {
+    id: string;
+    imageURL: string;
+    nom?: string;
+    niveau?: string;
+    temps: number;
+    calories: number;
+    note: number;
+};
+
+export type RecetteFilter = {
+    tags?: string[];
+    niveau?: string;
+    minTemps?: number;
+    maxTemps?: number;
+    minNote?: number;
+    maxNote?: number;
+    ingredients?: string[];
+    userId?: string;
+    search?: string;
+    limit?: number;
+};
+
 //Main functions
 export async function getUser(id: string) : Promise<UsersResponse | undefined> {
     try {
@@ -59,6 +82,125 @@ export async function getRecette(id: string) : Promise<Object | undefined> {
         console.log("[getRecette] Failed to get recette :", id, "Caught error :", e);
         return;
     }
+}
+
+export async function getRecetteMinimal(id: string) : Promise<RecetteListItem | undefined> {
+    try {
+        const recette = await pb.collection("Recettes").getOne(id);
+        const imageURL = pb.files.getURL(recette, recette.image);
+        const temps = (recette.tempsPreparation ?? 0) + (recette.tempsCuisson ?? 0);
+
+        const ingredients = await pb.collection("Contient").getFullList({filter: `recette = '${id}'`, expand: "ingredient"});
+        const calories = calculateNutritionValues(ingredients.map(normalizeIngredientForGetRecette)).calories;
+
+        const commentaires = await pb.collection("Commentaires").getFullList({filter: `recette = '${id}'`});
+        const note = calculateNote(commentaires);
+
+        return {
+            id: recette.id,
+            imageURL,
+            nom: recette.nom,
+            niveau: recette.niveau,
+            temps,
+            calories,
+            note,
+        };
+    } catch (e) {
+        console.log("[getRecetteMinimal] Failed to get recette :", id, "Caught error :", e);
+        return;
+    }
+}
+
+export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteListItem[]> {
+    const filterParts: string[] = [];
+
+    if (filters.userId) {
+        filterParts.push(`user = '${filters.userId}'`);
+    }
+    if (filters.niveau) {
+        filterParts.push(`niveau = '${filters.niveau}'`);
+    }
+    if (filters.tags && filters.tags.length) {
+        const tagFilters = filters.tags.map((tag) => `tags ?~ '${tag}'`);
+        filterParts.push(tagFilters.join(' && '));
+    }
+    if (filters.search) {
+        const escaped = filters.search.replace(/'/g, "\\'");
+        filterParts.push(`nom ?~ '${escaped}'`);
+    }
+
+    const filter = filterParts.join(' && ');
+    console.log("[getRecettes] Created filter :",filter);
+
+    const recettes = await pb.collection('Recettes').getFullList({ filter });
+
+    let recetteIds = recettes.map((r: any) => r.id);
+    console.log("[getRecettes] recettesIds :", recetteIds);
+    if (filters.ingredients) {
+        const ingredientFilter = filters.ingredients.map((ingredient) => `ingredient = '${ingredient}'`).join("||");
+        console.log("[getRecettes] Filtering by ingredient :", ingredientFilter);
+        const contains = await pb.collection('Contient').getFullList({ filter: ingredientFilter });
+        const recettesWithIngredient = (contains.map((c: any) => c.recette));
+        console.log("[getRecettes] idsWithIngredient :", recettesWithIngredient);
+        recetteIds = recetteIds.filter((id) => recettesWithIngredient.includes(id));
+    }
+
+    const recettesFiltered = recettes.filter((r: any) => recetteIds.includes(r.id));
+    console.log("[getRecettes] recettesFiltered :", recettesFiltered);
+
+    if (recetteIds.length === 0) return [];
+
+    const recetteFilter = recettesFiltered.map((recette) => `recette = '${recette.id}'`).join("||");
+    const contientRecords = await pb.collection('Contient').getFullList({ filter: recetteFilter, expand: 'ingredient' });
+    const commentaireRecords = await pb.collection('Commentaires').getFullList({ filter: recetteFilter });
+
+    const contientsByRecette = new Map<string, any[]>();
+    contientRecords.forEach((c: any) => {
+        const list = contientsByRecette.get(c.recette) ?? [];
+        list.push(c);
+        contientsByRecette.set(c.recette, list);
+    });
+
+    const commentairesByRecette = new Map<string, any[]>();
+    commentaireRecords.forEach((c: any) => {
+        const list = commentairesByRecette.get(c.recette) ?? [];
+        list.push(c);
+        commentairesByRecette.set(c.recette, list);
+    });
+
+    const result: RecetteListItem[] = recettesFiltered.map((r: any) => {
+        const temps = (r.tempsPreparation ?? 0) + (r.tempsCuisson ?? 0);
+
+        const calories = calculateNutritionValues(
+            (contientsByRecette.get(r.id) ?? []).map(normalizeIngredientForGetRecette),
+        ).calories;
+
+        const note = calculateNote(commentairesByRecette.get(r.id) ?? []);
+
+        return {
+            id: r.id,
+            imageURL: pb.files.getURL(r, r.image),
+            nom: r.nom,
+            niveau: r.niveau,
+            temps,
+            calories,
+            note,
+        };
+    });
+
+    const filteredByTemps = result.filter((item) => {
+        if (filters.minTemps != null && item.temps < filters.minTemps) return false;
+        if (filters.maxTemps != null && item.temps > filters.maxTemps) return false;
+        return true;
+    });
+
+    const filteredByNote = filteredByTemps.filter((item) => {
+        if (filters.minNote != null && item.note < filters.minNote) return false;
+        if (filters.maxNote != null && item.note > filters.maxNote) return false;
+        return true;
+    });
+
+    return filters.limit ? filteredByNote.slice(0, filters.limit) : filteredByNote;
 }
 
 export async function getIngredient(id: string) : Promise<IngredientsResponse | undefined> {
