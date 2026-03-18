@@ -1,5 +1,5 @@
 ---
-import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels } from "../../backend/functions"
+import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels, getProfessionnel } from "../../backend/functions"
 
 // const results = await getRecettes({
 //   tags: ['Végétarien'],
@@ -11,9 +11,11 @@ import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels } from ".
 
 // console.log(results)
 
-const results = await getProfessionnels({
-    professions: ['Diététicien'],
-});
+// const results = await getProfessionnels({
+//     professions: ['Diététicien'],
+// });
 
-console.log(results);
+// console.log(results);
+
+console.log(await getProfessionnel("ktmlagk011sffmg"))
 ---

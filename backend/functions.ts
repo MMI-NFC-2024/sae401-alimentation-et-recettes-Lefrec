@@ -87,10 +87,10 @@ export async function getRecette(id: string) : Promise<Object | undefined> {
         };
 
         const ingredients = await pb.collection("Contient").getFullList({filter: `recette = '${id}'`, expand: "ingredient"});
-        const ingredientsFixed = ingredients.map(normalizeIngredientForGetRecette);
+        const ingredientsFixed = ingredients.map(normalizeIngredient);
 
         const commentaires = await pb.collection("Commentaires").getFullList({filter: `recette = '${id}'`, expand: "user"});
-        const commentairesFixed = commentaires.map(normalizeCommentForGetRecette);
+        const commentairesFixed = commentaires.map(normalizeComment);
 
         const valeurs = calculateNutritionValues(ingredientsFixed);
 
@@ -110,7 +110,7 @@ export async function getRecetteMinimal(id: string) : Promise<RecetteListItem | 
         const temps = (recette.tempsPreparation ?? 0) + (recette.tempsCuisson ?? 0);
 
         const ingredients = await pb.collection("Contient").getFullList({filter: `recette = '${id}'`, expand: "ingredient"});
-        const calories = calculateNutritionValues(ingredients.map(normalizeIngredientForGetRecette)).calories;
+        const calories = calculateNutritionValues(ingredients.map(normalizeIngredient)).calories;
 
         const commentaires = await pb.collection("Commentaires").getFullList({filter: `recette = '${id}'`});
         const note = calculateNote(commentaires);
@@ -193,7 +193,7 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
         const temps = (r.tempsPreparation ?? 0) + (r.tempsCuisson ?? 0);
 
         const calories = calculateNutritionValues(
-            (contientsByRecette.get(r.id) ?? []).map(normalizeIngredientForGetRecette),
+            (contientsByRecette.get(r.id) ?? []).map(normalizeIngredient),
         ).calories;
 
         const note = calculateNote(commentairesByRecette.get(r.id) ?? []);
@@ -235,6 +235,34 @@ export async function getIngredient(id: string) : Promise<IngredientsResponse | 
         return ingredient;
     } catch (e) {
         console.log("[getIngredient] Failed to get ingredient :",id,"Caught error :",e);
+        return;
+    }
+}
+
+export async function getProfessionnel(id: string) : Promise<Object | undefined> {
+    try {
+        const professionnel = await pb.collection("Professionnels").getOne(id, {expand: 'user'});
+        const user = professionnel.expand.user;
+
+        const base = {
+            id: professionnel.id,
+            imageURL: pb.files.getURL(user, user.avatar),
+            nom: professionnel.nom,
+            prenom: professionnel.prenom,
+            description: professionnel.description,
+            lien: professionnel.lien,
+            profession: professionnel.profession,
+            certifie: professionnel.certifie,
+        };
+
+        const commentaires = await pb.collection("Commentaires").getFullList({filter: `professionnel = '${id}'`, expand: "user"});
+        const commentairesFixed = commentaires.map(normalizeComment);
+
+        const note = calculateNote(commentairesFixed);
+
+        return {...base, commentairesFixed, note};
+    } catch (e) {
+        console.log("[getProfessionnel] Failed",e);
         return;
     }
 }
@@ -330,7 +358,7 @@ function calculateNutritionValues(
     );
 }
 
-function normalizeIngredientForGetRecette(record: any) {
+function normalizeIngredient(record: any) {
     const ingredient = record.expand?.ingredient ?? {};
     return {
         id: record.id,
@@ -341,7 +369,7 @@ function normalizeIngredientForGetRecette(record: any) {
     };
 }
 
-function normalizeCommentForGetRecette(record: any) {
+function normalizeComment(record: any) {
     const user = record.expand?.user;
     return {
         created: record.created,
