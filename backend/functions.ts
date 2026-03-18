@@ -38,7 +38,7 @@ export async function getRecette(id: string) : Promise<Object | undefined> {
             niveau: recette.niveau,
             tempsCuisson: recette.tempsCuisson,
             tempsPreparation: recette.tempsPreparation,
-            temps: recette.tempsCuisson + recette.tempsPreparation,
+            temps: (recette.tempsPreparation ?? 0) + (recette.tempsCuisson ?? 0),
             userId: user.id,
             userImageURL: pb.files.getURL(user, user.avatar),
             userName: user.name,
@@ -52,7 +52,9 @@ export async function getRecette(id: string) : Promise<Object | undefined> {
 
         const valeurs = calculateNutritionValues(ingredientsFixed);
 
-        return { ...base, valeurs, ingredientsFixed, commentairesFixed };
+        const note = calculateNote(commentairesFixed);
+
+        return { ...base, valeurs, note, ingredientsFixed, commentairesFixed };
     } catch (e) {
         console.log("[getRecette] Failed to get recette :", id, "Caught error :", e);
         return;
@@ -124,4 +126,13 @@ function normalizeCommentForGetRecette(record: any) {
         id: user?.id,
         imageURL: pb.files.getURL(user, user?.avatar),
     };
+}
+
+function calculateNote(record: any) : number {
+    const notes: number[] = record
+        .map((commentaire: any) => commentaire.note)
+        .filter((note: unknown): note is number => typeof note === "number");
+    if (notes.length === 0) return 0;
+    const total = notes.reduce((acc, note) => acc + note, 0);
+    return parseFloat((total / notes.length).toFixed(1));
 }
