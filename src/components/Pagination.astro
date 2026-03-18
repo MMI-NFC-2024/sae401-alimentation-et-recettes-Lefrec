@@ -1,14 +1,51 @@
 ---
-import Arrow from '../assets/svg/Arrow.svg';
-const { current, max, theme = "recette" } = Astro.props;
+import Arrow from "../assets/svg/Arrow.svg";
+const { currentPage, maxPages, theme = "recette" } = Astro.props;
 ---
 
 <div class="centerflex gap-4 p-1 rounded-full bg-light shadow-(--base-shadow)">
-    <div class="centerflex rounded-full size-9 shadow-(--inside-shadow)" class:list={(current == 1) ? "bg-not-so-dark" : `bg-${theme}-dark`}>
-        <Arrow/>
-    </div>
-    <p class="text-base text-not-so-dark">{current} sur {max}</p>
-    <div class="centerflex rounded-full size-9 shadow-(--inside-shadow)" class:list={(current == max) ? "bg-not-so-dark" : `bg-${theme}-dark`}>
-        <Arrow class="-scale-x-100"/>
-    </div>
+  <button
+    id="previous"
+    class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer"
+    class:list={currentPage == 1 ? "bg-not-so-dark" : `bg-${theme}-dark`}
+  >
+    <Arrow />
+  </button>
+  <p class="text-base text-not-so-dark">{currentPage} sur {maxPages}</p>
+  <button
+    id="next"
+    class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer"
+    class:list={currentPage == maxPages ? "bg-not-so-dark" : `bg-${theme}-dark`}
+  >
+    <Arrow class="-scale-x-100" />
+  </button>
 </div>
+
+<script>
+  const previous = document.getElementById("previous");
+  const next = document.getElementById("next");
+
+  if (previous) {
+    if (previous.classList.contains("bg-not-so-dark")) {
+      previous.setAttribute('disabled',"");
+    };
+    previous.addEventListener("click", () => {
+      let urlParams = new URLSearchParams(location.search);
+      const page = urlParams.get("page");
+      urlParams.set("page", (parseInt(page ?? "1") - 1).toString());
+      location.search = urlParams.toString();
+    });
+  }
+
+  if (next) {
+    if (next.classList.contains("bg-not-so-dark")) {
+      next.setAttribute('disabled',"");
+    };
+    next.addEventListener("click", () => {
+      let urlParams = new URLSearchParams(location.search);
+      const page = urlParams.get("page");
+      urlParams.set("page", (parseInt(page ?? "1") + 1).toString());
+      location.search = urlParams.toString();
+    });
+  }
+</script>

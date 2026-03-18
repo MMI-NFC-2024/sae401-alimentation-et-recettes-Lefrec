@@ -1,8 +1,17 @@
 ---
-import Loop from '../assets/svg/loop.svg'
+import Loop from "../assets/svg/loop.svg";
+const { value = "" } = Astro.props;
 ---
 
-<div class="flex w-full items-center justify-between p-2 rounded-full bg-light shadow-(--base-shadow)">
-    <input class="text-not-so-dark text-base appearance-none" type="text" name="recherche" placeholder="Rechercher">
-    <Loop/>
+<div
+  class="flex w-full items-center justify-between p-2 rounded-full bg-light shadow-(--base-shadow)"
+>
+  <input
+    class="text-not-so-dark text-base appearance-none"
+    type="text"
+    name="recherche"
+    placeholder="Rechercher"
+    value={value}
+  />
+  <Loop />
 </div>

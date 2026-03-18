@@ -7,26 +7,60 @@ import Pagination from "../../components/Pagination.astro";
 import { getRecettes } from "../../../backend/functions";
 import CardRecette from "../../components/CardRecette.astro";
 
-const recettes = await getRecettes();
-const maxRows = 2;
+const url = new URL(Astro.request.url);
+const search = url.searchParams.get("search") ?? "";
+const niveau = url.searchParams.get("niveau") ?? "";
+const minTemps = url.searchParams.get("minTemps")
+  ? Number(url.searchParams.get("minTemps"))
+  : undefined;
+const maxTemps = url.searchParams.get("maxTemps")
+  ? Number(url.searchParams.get("maxTemps"))
+  : undefined;
+const minNote = url.searchParams.get("minNote")
+  ? Number(url.searchParams.get("minNote"))
+  : undefined;
+const maxNote = url.searchParams.get("maxNote")
+  ? Number(url.searchParams.get("maxNote"))
+  : undefined;
+const tags = url.searchParams.getAll("tags").filter(Boolean);
+const page = url.searchParams.get("page")
+  ? Number(url.searchParams.get("page"))
+  : 1;
+const perPage = url.searchParams.get("perPage")
+  ? Number(url.searchParams.get("perPage"))
+  : 10;
+
+const recettes = await getRecettes({
+  search,
+  niveau,
+  minTemps,
+  maxTemps,
+  minNote,
+  maxNote,
+  tags: tags.length ? tags : undefined,
+});
+
+const total = recettes?.length ?? 0;
+const maxPages = Math.max(1, Math.ceil(total / perPage));
+const pageRecettes = recettes.slice((page - 1) * perPage, page * perPage);
 ---
 
 <Layout titre="Nos recettes" theme="recette">
   <div class="centerflex flex-col gap-5 px-6 pt-10 pb-4 w-full">
     <h1>Nos recettes</h1>
     <div class="centerflex w-full">
-      <Search />
+      <Search value={search} />
       <Filtres />
     </div>
     <Filtre content="Végétarien" />
     <div class="centerflex w-full gap-5 flex-wrap">
       {
-        recettes.map((recette) => {
+        pageRecettes.map((recette) => {
           return <CardRecette {...recette} />;
         })
       }
     </div>
 
-    <Pagination current="1" max="1" />
+    <Pagination currentPage={page} maxPages={maxPages} />
   </div>
 </Layout>

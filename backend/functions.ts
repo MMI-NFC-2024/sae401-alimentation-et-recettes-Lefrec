@@ -32,7 +32,8 @@ export type RecetteFilter = {
     ingredients?: string[];
     userId?: string;
     search?: string;
-    limit?: number;
+    page?: number;
+    perPage?: number;
 };
 
 export type ProfessionnelListItem = {
@@ -221,7 +222,9 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
         return true;
     });
 
-    return filters.limit ? filteredByNote.slice(0, filters.limit) : filteredByNote;
+    const filteredAndPaginated = filteredByTemps.slice((filters.page ?? 0)*(filters.perPage ?? 10),(filters.page ?? 0)*(filters.perPage ?? 10)+(filters.perPage ?? 10));
+
+    return filteredAndPaginated;
 } catch (e) {
     console.log("[getRecettes] failed :", e);
     return;
