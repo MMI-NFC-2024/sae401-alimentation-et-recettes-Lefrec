@@ -1,13 +1,19 @@
 ---
-import { getRecette, getRecetteMinimal, getRecettes } from "../../backend/functions"
+import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels } from "../../backend/functions"
 
-const results = await getRecettes({
-  tags: ['Végétarien'],
-  niveau: 'débutant',
-  maxTemps: 30,
-  minNote: 3.5,
-  ingredients: ['x3dblfljnxnyhof'],
+// const results = await getRecettes({
+//   tags: ['Végétarien'],
+//   niveau: 'débutant',
+//   maxTemps: 30,
+//   minNote: 3.5,
+//   ingredients: ['x3dblfljnxnyhof'],
+// });
+
+// console.log(results)
+
+const results = await getProfessionnels({
+    professions: ['Diététicien'],
 });
 
-console.log(results)
+console.log(results);
 ---

@@ -35,6 +35,25 @@ export type RecetteFilter = {
     limit?: number;
 };
 
+export type ProfessionnelListItem = {
+    id: string;
+    imageURL: string;
+    nom: string;
+    prenom: string;
+    description: string;
+    profession?: string[];
+    note: number;
+    certifie: boolean;
+};
+
+export type ProfessionnelsFilter = {
+    professions?: string[];
+    minNote?: number;
+    maxNote?: number;
+    search?: string;
+    limit?: number;
+};
+
 //Main functions
 export async function getUser(id: string) : Promise<UsersResponse | undefined> {
     try {
@@ -111,7 +130,9 @@ export async function getRecetteMinimal(id: string) : Promise<RecetteListItem | 
     }
 }
 
-export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteListItem[]> {
+//return a list of recettes based of various optional filters
+export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteListItem[] | undefined> {
+    try {
     const filterParts: string[] = [];
 
     if (filters.userId) {
@@ -201,6 +222,10 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
     });
 
     return filters.limit ? filteredByNote.slice(0, filters.limit) : filteredByNote;
+} catch (e) {
+    console.log("[getRecettes] failed :", e);
+    return;
+}
 }
 
 export async function getIngredient(id: string) : Promise<IngredientsResponse | undefined> {
@@ -211,6 +236,64 @@ export async function getIngredient(id: string) : Promise<IngredientsResponse | 
     } catch (e) {
         console.log("[getIngredient] Failed to get ingredient :",id,"Caught error :",e);
         return;
+    }
+}
+
+export async function getProfessionnels(filters: ProfessionnelsFilter = {}): Promise<any> {
+    try {
+        const filterParts: string[] = [];
+
+        if (filters.professions && filters.professions.length) {
+            const tagFilters = filters.professions.map((profession) => `profession ?~ '${profession}'`);
+            filterParts.push(tagFilters.join(' && '));
+        }
+        if (filters.search) {
+            const escaped = filters.search.replace(/'/g, "\\'");
+            filterParts.push(`nom ?~ '${escaped}' || prenom ?~ '${escaped}'`);
+        }
+
+        const filter = filterParts.join(' && ');
+        console.log("[getProfessionnels] Created filter :",filter);
+
+        const professionnels = await pb.collection('Professionnels').getFullList({ filter, expand: "user" });
+
+        if (professionnels.length === 0) return [];
+
+        const professionnelFilter = professionnels.map((pro) => `professionnel = '${pro.id}'`).join("||");
+        const commentaireRecords = await pb.collection('Commentaires').getFullList({ filter: professionnelFilter });
+
+        const commentairesByProfessionnel = new Map<string, any[]>();
+        commentaireRecords.forEach((c: any) => {
+            const list = commentairesByProfessionnel.get(c.professionnel) ?? [];
+            list.push(c);
+            commentairesByProfessionnel.set(c.professionnel, list);
+        });
+
+        const result: ProfessionnelListItem[] = professionnels.map((pro: any) => {
+            const note = calculateNote(commentairesByProfessionnel.get(pro.id) ?? []);
+
+            return {
+                id: pro.id,
+                imageURL: pb.files.getURL(pro.expand.user, pro.expand.user.avatar),
+                nom: pro.nom,
+                prenom: pro.prenom,
+                description: pro.description,
+                profession: pro.profession,
+                certifie: pro.certifie,
+                note,
+            }
+        })
+
+        const filteredByNote = result.filter((item) => {
+            if (filters.minNote != null && item.note < filters.minNote) return false;
+            if (filters.maxNote != null && item.note > filters.maxNote) return false;
+            return true;
+        });
+
+        return filters.limit ? filteredByNote.slice(0, filters.limit) : filteredByNote;
+    } catch (e) {
+        console.log("[getProfessionnels] failed :", e);
+    return;
     }
 }
 
