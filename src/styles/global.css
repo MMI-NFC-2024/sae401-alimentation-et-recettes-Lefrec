@@ -35,7 +35,7 @@
         @apply text-lg font-medium;
     }
     h3 {
-        @apply text-base font-semibold;
+        @apply font-common text-base font-semibold text-center;
     }
     p {
         @apply font-common text-sm;

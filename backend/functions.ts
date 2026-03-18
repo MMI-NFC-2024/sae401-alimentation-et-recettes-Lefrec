@@ -15,8 +15,8 @@ type NutritionValues = {
 export type RecetteListItem = {
     id: string;
     imageURL: string;
-    nom?: string;
-    niveau?: string;
+    nom: string;
+    niveau: string;
     temps: number;
     calories: number;
     note: number;
