@@ -2,12 +2,20 @@
 import Star from "../assets/svg/Star.svg";
 
 const { note } = Astro.props;
+
+const noteFloored = Math.floor(note);
+
+const stars = [] 
+
+for (let i = 1; i <= 5; i++) {
+    stars.push(i<=noteFloored)
+}
+
+console.log(stars)
 ---
 
 <div class="flex *:size-4">
-    <Star class="fill-gold"/>
-    <Star class="fill-gold"/>
-    <Star class="fill-gold"/>
-    <Star class="fill-gold"/>
-    <Star class="fill-gold"/>
+    {stars.map((star) => (
+        <Star class={star ? "fill-gold" : "fill-not-so-light"}/>
+    ))}
 </div>

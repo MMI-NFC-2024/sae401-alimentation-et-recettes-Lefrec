@@ -1,15 +1,11 @@
 ---
 import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels, getProfessionnel } from "../../backend/functions"
 
-// const results = await getRecettes({
-//   tags: ['Végétarien'],
-//   niveau: 'débutant',
-//   maxTemps: 30,
-//   minNote: 3.5,
-//   ingredients: ['x3dblfljnxnyhof'],
-// });
+const results = await getRecettes({
+  search: "cakes"
+});
 
-// console.log(results)
+console.log(results)
 
 // const results = await getProfessionnels({
 //     professions: ['Diététicien'],
@@ -17,5 +13,4 @@ import { getRecette, getRecetteMinimal, getRecettes, getProfessionnels, getProfe
 
 // console.log(results);
 
-console.log(await getProfessionnel("ktmlagk011sffmg"))
 ---
