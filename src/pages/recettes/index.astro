@@ -8,8 +8,7 @@ import { getRecettes } from "../../../backend/functions";
 import CardRecette from "../../components/CardRecette.astro";
 
 const recettes = await getRecettes();
-const maxPerPage = 1;
-const maxPages = Math.ceil(recettes?.length / maxPerPage);
+const maxRows = 2;
 ---
 
 <Layout titre="Nos recettes" theme="recette">
@@ -20,15 +19,14 @@ const maxPages = Math.ceil(recettes?.length / maxPerPage);
       <Filtres />
     </div>
     <Filtre content="Végétarien" />
-
-    <div class="w-full">
-        <div class="grid grid-cols-2 gap-5">
-          {recettes.map((recette) => {
-            return <CardRecette {...recette} />;
-          })}
-        </div>
+    <div class="centerflex w-full gap-5 flex-wrap">
+      {
+        recettes.map((recette) => {
+          return <CardRecette {...recette} />;
+        })
+      }
     </div>
 
-    <Pagination current="1" max={maxPages} />
+    <Pagination current="1" max="1" />
   </div>
 </Layout>

@@ -1,33 +1,39 @@
 ---
-import Note from './Note.astro'
+import Note from "./Note.astro";
 
 interface Props {
-    id: string,
-    nom: string,
-    imageURL: string,
-    niveau: string,
-    temps: number,
-    calories: number,
-    note: number,
+  id: string;
+  nom: string;
+  imageURL: string;
+  niveau: string;
+  temps: number;
+  calories: number;
+  note: number;
 }
-const { id, nom, imageURL, niveau, temps, calories, note } = Astro.props
+const { id, nom, imageURL, niveau, temps, calories, note } = Astro.props;
 ---
 
-<article class="flex flex-col min-w-40 max-w-50 mt-20 rounded-xl bg-light shadow-(--base-shadow)">
-    <a href=`/recettes/${id}` class="flex flex-col justify-center p-2 pb-0">
-        <div class="relative flex w-fill p-1 h-20">
-            <img class="absolute bottom-0" src={imageURL} alt="La recette présentée dans une assiette vu du dessus">
-        </div>
-        <header class="flex flex-col gap-1">
-            <h3 class="line-clamp-2">{ nom }</h3>
-            <div class="centerflex flex-wrap *:font-light *:text-xs">
-                <p><span class="font-medium text-sm">{ niveau }</span></p>
-                <p><span class="font-medium text-sm">{ temps }</span>min</p>
-                <p><span class="font-medium text-sm">{ calories }</span>kcal</p>
-            </div>
-        </header>
-    </a>
-    <div class="flex justify-between p-2">
-        <Note note={note}/>
+<article
+  class="flex flex-col flex-1 min-w-[150px] max-w-[200px] mt-20 rounded-xl bg-light shadow-(--base-shadow)"
+>
+  <a href=`/recettes/${id}` class="flex flex-col justify-center p-2 pb-0">
+    <div class="relative flex w-fill p-1 h-20">
+      <img
+        class="absolute bottom-0"
+        src={imageURL}
+        alt="La recette présentée dans une assiette vu du dessus"
+      />
     </div>
+    <header class="flex flex-col gap-1">
+      <h3 class="line-clamp-2">{nom}</h3>
+      <div class="centerflex flex-wrap *:font-light *:text-xs">
+        <p><span class="font-medium text-sm">{niveau}</span></p>
+        <p><span class="font-medium text-sm">{temps}</span>min</p>
+        <p><span class="font-medium text-sm">{calories}</span>kcal</p>
+      </div>
+    </header>
+  </a>
+  <div class="flex justify-between p-2">
+    <Note note={note} />
+  </div>
 </article>
