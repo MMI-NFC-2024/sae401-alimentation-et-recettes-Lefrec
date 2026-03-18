@@ -9,9 +9,36 @@ const { value = "" } = Astro.props;
   <input
     class="text-not-so-dark text-base appearance-none"
     type="text"
-    name="recherche"
+    id="search"
     placeholder="Rechercher"
     value={value}
   />
-  <Loop />
+  <button id="loop">
+    <Loop />
+  </button>
 </div>
+
+<script>
+  const search = document.getElementById("search") as HTMLInputElement;
+  const loop = document.getElementById("loop");
+
+  if (search && loop) {
+    loop.addEventListener("click", () => {
+      applySearch(search.value);
+    })
+
+    document.addEventListener("keyup", (key) => {
+      if (key.code === "Enter") {
+        loop.click();
+      }
+    })
+  }
+
+  function applySearch(text : string) {
+      let urlParams = new URLSearchParams(location.search);
+      const search = urlParams.get("search");
+      urlParams.set("search", text);
+      urlParams.set("page", "1");
+      location.search = urlParams.toString();
+  }
+</script>
