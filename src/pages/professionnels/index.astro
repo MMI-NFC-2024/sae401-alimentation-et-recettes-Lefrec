@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layout/Layout.astro";
 import Search from "../../components/Search.astro";
+import Filtre from "../../components/Filtre.astro";
 import Pagination from "../../components/Pagination.astro";
 import CardProfessionnel from "../../components/CardProfessionnel.astro";
 import { getProfessionnels } from "../../../backend/functions";
@@ -20,6 +21,14 @@ const page = url.searchParams.get("page")
 const perPage = url.searchParams.get("perPage")
   ? Number(url.searchParams.get("perPage"))
   : 10;
+
+const activeFilters = [];
+if (search)
+  activeFilters.push({
+    key: "search",
+    value: search,
+    label: `Recherche : ${search}`,
+  });
 
 const professionnels = await getProfessionnels({
     search,
@@ -41,6 +50,19 @@ const pageProfessionnels = professionnels.slice((page - 1) * perPage, page * per
     <div class="centerflex w-full">
       <Search value={search} />
     </div>
+    <div id="active-filters" class="centerflex w-full gap-2 flex-wrap">
+        {
+          activeFilters.map((filter) => {
+            return (
+              <Filtre
+                content={filter.label}
+                filterKey={filter.key}
+                filterValue={filter.value}
+              />
+            );
+          })
+        }
+      </div>
     <div class="centerflex w-full gap-5 flex-wrap">
       {
         pageProfessionnels.map((professionnel) => {
@@ -52,3 +74,42 @@ const pageProfessionnels = professionnels.slice((page - 1) * perPage, page * per
     <Pagination currentPage={page} maxPages={maxPages} />
   </div>
 </Layout>
+
+<script>
+  const activeFilters = document.getElementById("active-filters");
+
+  function removeFilter(key, value) {
+    updateQueryParams((params) => {
+      if (key === "tags") {
+        const tags = params
+          .getAll("tags")
+          .filter((t) => t.trim() && t !== value);
+        params.delete("tags");
+        tags.forEach((t) => params.append("tags", t));
+        return;
+      }
+      params.delete(key);
+    });
+  }
+
+  function updateQueryParams(updater) {
+    const urlParams = new URLSearchParams(location.search);
+    updater(urlParams);
+    // reset pagination when filters change
+    urlParams.set("page", "1");
+    location.search = urlParams.toString();
+  }
+
+  activeFilters?.addEventListener("click", (event) => {
+      const target = event.target;
+      const deleteButton = target.closest?.(".filtre-delete");
+      if (!deleteButton) return;
+
+      const filterElement = deleteButton.closest?.(".filtre");
+      if (!filterElement) return;
+
+      const key = filterElement.dataset.filterKey;
+      const value = filterElement.dataset.filterValue;
+      removeFilter(key, value);
+    });
+</script>
