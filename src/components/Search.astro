@@ -27,11 +27,11 @@ const { value = "" } = Astro.props;
       applySearch(search.value);
     })
 
-    document.addEventListener("keyup", (key) => {
-      if (key.code === "Enter") {
-        loop.click();
-      }
-    })
+    // document.addEventListener("keyup", (key) => {
+    //   if (key.code === "Enter") {
+    //     loop.click();
+    //   }
+    // })
   }
 
   function applySearch(text : string) {

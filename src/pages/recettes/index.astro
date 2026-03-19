@@ -23,6 +23,48 @@ const maxNote = url.searchParams.get("maxNote")
   ? Number(url.searchParams.get("maxNote"))
   : undefined;
 const tags = url.searchParams.getAll("tags").filter(Boolean);
+
+const activeFilters = [];
+if (search)
+  activeFilters.push({
+    key: "search",
+    value: search,
+    label: `Recherche : ${search}`,
+  });
+if (niveau)
+  activeFilters.push({
+    key: "niveau",
+    value: niveau,
+    label: `${niveau}`,
+  });
+if (minTemps != null)
+  activeFilters.push({
+    key: "minTemps",
+    value: String(minTemps),
+    label: `Temps ≥ ${minTemps} min`,
+  });
+if (maxTemps != null)
+  activeFilters.push({
+    key: "maxTemps",
+    value: String(maxTemps),
+    label: `Temps ≤ ${maxTemps} min`,
+  });
+if (minNote != null)
+  activeFilters.push({
+    key: "minNote",
+    value: String(minNote),
+    label: `Note ≥ ${minNote}`,
+  });
+if (maxNote != null)
+  activeFilters.push({
+    key: "maxNote",
+    value: String(maxNote),
+    label: `Note ≤ ${maxNote}`,
+  });
+tags.forEach((tag) =>
+  activeFilters.push({ key: "tags", value: tag, label: `Tag : ${tag}` }),
+);
+
 const page = url.searchParams.get("page")
   ? Number(url.searchParams.get("page"))
   : 1;
@@ -48,11 +90,27 @@ const pageRecettes = recettes.slice((page - 1) * perPage, page * perPage);
 <Layout titre="Nos recettes" theme="recette">
   <div class="centerflex flex-col gap-5 px-6 pt-10 pb-4 w-full">
     <h1>Nos recettes</h1>
-    <div class="centerflex w-full">
-      <Search value={search} />
-      <Filtres />
+    <div class="centerflex w-full flex-col gap-3">
+      <div class="centerflex w-full">
+        <Search value={search} />
+        <Filtres />
+      </div>
+
+      <div id="active-filters" class="centerflex w-full gap-2 flex-wrap">
+        {
+          activeFilters.map((filter) => {
+            return (
+              <Filtre
+                content={filter.label}
+                filterKey={filter.key}
+                filterValue={filter.value}
+              />
+            );
+          })
+        }
+      </div>
     </div>
-    <Filtre content="Végétarien" />
+
     <div class="centerflex w-full gap-5 flex-wrap">
       {
         pageRecettes.map((recette) => {

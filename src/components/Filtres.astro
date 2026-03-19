@@ -1,12 +1,285 @@
 ---
-import Filtre from "../assets/svg/settings.svg";
+import FiltreIcon from "../assets/svg/settings.svg";
+import { RecettesTagsOptions } from "../utils/type";
+
+const tagsOptions = Object.values(RecettesTagsOptions);
 ---
 
-<button id="filtres" class="centerflex p-2 rounded-full bg-light shadow-(--base-shadow)">
-  <p class="text-not-so-dark text-base">Filtres</p>
-  <Filtre class="h-full" />
-</button>
+<div class="relative">
+  <button
+    id="filtres"
+    class="centerflex p-2 rounded-full bg-light shadow-(--base-shadow)"
+  >
+    <p class="text-not-so-dark text-base">Filtres</p>
+    <FiltreIcon class="h-full" />
+  </button>
+
+  <div
+    id="filters-card"
+    class="hidden absolute right-0 mt-2 w-80 rounded-xl bg-light p-4 shadow-(--base-shadow) z-10"
+  >
+    <p class="font-semibold text-not-so-dark mb-2">Ajouter un filtre</p>
+
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label for="niveau-select" class="text-sm text-not-so-dark"
+          >Niveau</label
+        >
+        <select
+          id="niveau-select"
+          class="w-full rounded-lg border border-gray-200 px-2 py-1 bg-white text-not-so-dark"
+        >
+          <option value="">Aucun</option>
+          <option value="débutant">Débutant</option>
+          <option value="intermédiaire">Intermédiaire</option>
+          <option value="avancée">Avancée</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-not-so-dark">Temps (minutes)</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label for="minTemps-number" class="text-xs text-not-so-dark"
+              >Min</label
+            >
+            <input
+              id="minTemps-number"
+              type="number"
+              min="0"
+              max="240"
+              step="5"
+              class="w-full rounded-lg border border-gray-200 px-2 py-1"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="maxTemps-number" class="text-xs text-not-so-dark"
+              >Max</label
+            >
+            <input
+              id="maxTemps-number"
+              type="number"
+              min="0"
+              max="240"
+              step="5"
+              class="w-full rounded-lg border border-gray-200 px-2 py-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-not-so-dark">Note</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label for="minNote-number" class="text-xs text-not-so-dark"
+              >Min</label
+            >
+            <input
+              id="minNote-number"
+              type="number"
+              min="0"
+              max="5"
+              step="0.5"
+              class="w-full rounded-lg border border-gray-200 px-2 py-1"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="maxNote-number" class="text-xs text-not-so-dark"
+              >Max</label
+            >
+            <input
+              id="maxNote-number"
+              type="number"
+              min="0"
+              max="5"
+              step="0.5"
+              class="w-full rounded-lg border border-gray-200 px-2 py-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-not-so-dark">Tags</span>
+        <div class="grid grid-cols-2 gap-2">
+          {
+            tagsOptions.map((tag) => (
+              <label class="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-2 bg-white">
+                <input type="checkbox" class="tag-checkbox" value={tag} />
+                <span class="text-sm text-not-so-dark">{tag}</span>
+              </label>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-end">
+        <button
+          id="apply-filters"
+          type="button"
+          class="rounded-lg bg-not-so-dark px-4 py-2 text-white"
+        >
+          Appliquer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   const filtresBtn = document.getElementById("filtres");
+  const filtersCard = document.getElementById("filters-card");
+  const activeFilters = document.getElementById("active-filters");
+  const applyFiltersBtn = document.getElementById("apply-filters");
+
+  const niveauSelect = document.getElementById("niveau-select");
+  const minTempsNumber = document.getElementById("minTemps-number");
+  const maxTempsNumber = document.getElementById("maxTemps-number");
+  const minNoteNumber = document.getElementById("minNote-number");
+  const maxNoteNumber = document.getElementById("maxNote-number");
+  const tagCheckboxes = Array.from(document.querySelectorAll(".tag-checkbox"));
+
+  function closeFiltersCard() {
+    filtersCard?.classList.add("hidden");
+  }
+
+  function toggleFiltersCard() {
+    filtersCard?.classList.toggle("hidden");
+  }
+
+  function updateQueryParams(updater) {
+    const urlParams = new URLSearchParams(location.search);
+    updater(urlParams);
+    // reset pagination when filters change
+    urlParams.set("page", "1");
+    location.search = urlParams.toString();
+  }
+
+  function removeFilter(key, value) {
+    updateQueryParams((params) => {
+      if (key === "tags") {
+        const tags = params
+          .getAll("tags")
+          .filter((t) => t.trim() && t !== value);
+        params.delete("tags");
+        tags.forEach((t) => params.append("tags", t));
+        return;
+      }
+      params.delete(key);
+    });
+  }
+
+  function syncControlWithParam(control, paramKey, formatter = (v) => v) {
+    const params = new URLSearchParams(location.search);
+    const value = params.get(paramKey);
+    if (value != null && value !== "") {
+      control.value = formatter(value);
+    }
+  }
+
+  function syncFromUrl() {
+    const params = new URLSearchParams(location.search);
+
+    const minTemps = params.get("minTemps");
+    if (minTemps != null) {
+      minTempsNumber.value = minTemps;
+    }
+
+    const maxTemps = params.get("maxTemps");
+    if (maxTemps != null) {
+      maxTempsNumber.value = maxTemps;
+    }
+
+    const minNote = params.get("minNote");
+    if (minNote != null) {
+      minNoteNumber.value = minNote;
+    }
+
+    const maxNote = params.get("maxNote");
+    if (maxNote != null) {
+      maxNoteNumber.value = maxNote;
+    }
+
+    syncControlWithParam(niveauSelect, "niveau");
+
+    const tags = params.getAll("tags");
+    tagCheckboxes.forEach((checkbox) => {
+      checkbox.checked = tags.includes(checkbox.value);
+    });
+  }
+
+  function applyFilters() {
+    const params = new URLSearchParams(location.search);
+
+    // Clear existing filters
+    ["niveau", "minTemps", "maxTemps", "minNote", "maxNote"].forEach((key) =>
+      params.delete(key),
+    );
+    params.delete("tags");
+
+    const niveau = niveauSelect?.value;
+    if (niveau) params.set("niveau", niveau);
+
+    const minTemps = minTempsNumber?.value;
+    if (minTemps) params.set("minTemps", minTemps);
+
+    const maxTemps = maxTempsNumber?.value;
+    if (maxTemps) params.set("maxTemps", maxTemps);
+
+    const minNote = minNoteNumber?.value;
+    if (minNote) params.set("minNote", minNote);
+
+    const maxNote = maxNoteNumber?.value;
+    if (maxNote) params.set("maxNote", maxNote);
+
+    const checkedTags = tagCheckboxes
+      .filter((c) => c.checked)
+      .map((c) => c.value);
+    checkedTags.forEach((tag) => params.append("tags", tag));
+
+    // reset pagination when filters change
+    params.set("page", "1");
+
+    location.search = params.toString();
+  }
+
+  function onReady() {
+    syncFromUrl();
+
+    applyFiltersBtn?.addEventListener("click", () => {
+      applyFilters();
+    });
+
+    filtresBtn?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleFiltersCard();
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!filtersCard?.contains(target) && target !== filtresBtn) {
+        closeFiltersCard();
+      }
+    });
+
+    activeFilters?.addEventListener("click", (event) => {
+      const target = event.target;
+      const deleteButton = target.closest?.(".filtre-delete");
+      if (!deleteButton) return;
+
+      const filterElement = deleteButton.closest?.(".filtre");
+      if (!filterElement) return;
+
+      const key = filterElement.dataset.filterKey;
+      const value = filterElement.dataset.filterValue;
+      removeFilter(key, value);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onReady);
+  } else {
+    onReady();
+  }
 </script>

@@ -224,7 +224,7 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
 
     // const filteredAndPaginated = filteredByTemps.slice((filters.page ?? 0)*(filters.perPage ?? 10),(filters.page ?? 0)*(filters.perPage ?? 10)+(filters.perPage ?? 10));
 
-    return filteredByTemps;
+    return filteredByNote;
 } catch (e) {
     console.log("[getRecettes] failed :", e);
     return;

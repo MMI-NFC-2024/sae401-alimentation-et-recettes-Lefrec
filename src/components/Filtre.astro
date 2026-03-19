@@ -1,10 +1,20 @@
 ---
 import Delete from "../assets/svg/delete.svg";
 
-const { content } = Astro.props;
+const { content, filterKey, filterValue } = Astro.props;
 ---
 
-<div class="centerflex py-1 px-2 rounded-full bg-light">
+<div
+  class="centerflex py-1 px-2 rounded-full bg-light filtre"
+  data-filter-key={filterKey}
+  data-filter-value={filterValue}
+>
   <p class="text-not-so-dark text-base">{content}</p>
-  <Delete/>
+  <button
+    type="button"
+    class="ml-2 filtre-delete"
+    aria-label="Supprimer le filtre"
+  >
+    <Delete />
+  </button>
 </div>
