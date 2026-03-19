@@ -1,0 +1,54 @@
+---
+import Layout from "../../layout/Layout.astro";
+import Search from "../../components/Search.astro";
+import Pagination from "../../components/Pagination.astro";
+import CardProfessionnel from "../../components/CardProfessionnel.astro";
+import { getProfessionnels } from "../../../backend/functions";
+
+const url = new URL(Astro.request.url);
+const search = url.searchParams.get("search") ?? "";
+const professions = url.searchParams.getAll("profession").filter(Boolean);
+const minNote = url.searchParams.get("minNote")
+  ? Number(url.searchParams.get("minNote"))
+  : undefined;
+const maxNote = url.searchParams.get("maxNote")
+  ? Number(url.searchParams.get("maxNote"))
+  : undefined;
+const page = url.searchParams.get("page")
+  ? Number(url.searchParams.get("page"))
+  : 1;
+const perPage = url.searchParams.get("perPage")
+  ? Number(url.searchParams.get("perPage"))
+  : 10;
+
+const professionnels = await getProfessionnels({
+    search,
+    professions :  professions.length ? professions : undefined,
+    minNote,
+    maxNote,
+});
+
+console.log(professionnels);
+
+const total = professionnels?.length ?? 0;
+const maxPages = Math.max(1, Math.ceil(total / perPage));
+const pageProfessionnels = professionnels.slice((page - 1) * perPage, page * perPage);
+---
+
+<Layout titre="Les professionnels" theme="pro">
+  <div class="centerflex flex-col gap-5 px-6 pt-10 pb-4 w-full">
+    <h1>Les professionnels</h1>
+    <div class="centerflex w-full">
+      <Search value={search} />
+    </div>
+    <div class="centerflex w-full gap-5 flex-wrap">
+      {
+        pageProfessionnels.map((professionnel) => {
+          return <CardProfessionnel {...professionnel} />;
+        })
+      }
+    </div>
+
+    <Pagination currentPage={page} maxPages={maxPages} />
+  </div>
+</Layout>

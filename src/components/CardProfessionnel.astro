@@ -1,0 +1,29 @@
+---
+import Note from "./Note.astro";
+import Certif from "../assets/svg/certif.svg";
+
+interface Props {
+  id: string;
+  nom: string;
+  prenom: string;
+  description: string;
+  professions: Array<string>;
+  imageURL: string;
+  note: number;
+}
+const { id, nom, prenom, imageURL, description, professions, note } = Astro.props;
+---
+
+<article
+  class="flex w-full p-2 gap-2 rounded-l-full bg-light shadow-(--base-shadow)"
+>
+  <img class="size-20 rounded-full" src={imageURL} alt="Photo de profil du professionnel">
+  <a href=`/professionnels/${id}` class="flex flex-col w-full gap-1">
+    <header class="centerflex gap-1">
+        <h3 class="w-full text-left">{prenom} {nom}</h3>
+        <Note note={note}/>
+        <Certif />
+    </header>
+    <p class="line-clamp-2">{description}</p>
+  </a>
+</article>

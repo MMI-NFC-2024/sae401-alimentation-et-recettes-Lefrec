@@ -86,7 +86,7 @@ export type ContientRecord = {
 	updated: IsoAutoDateString
 }
 
-export enum IngredientsFieldOptions {
+export enum IngredientsTypeOptions {
 	"Viande" = "Viande",
 	"Légume" = "Légume",
 	"Fruit" = "Fruit",
@@ -97,11 +97,11 @@ export enum IngredientsFieldOptions {
 }
 export type IngredientsRecord<Tvaleurs = unknown> = {
 	created: IsoAutoDateString
-	field?: IngredientsFieldOptions[]
 	id: string
 	image?: FileNameString
 	nom?: string
 	poidsUnitaire?: number
+	type?: IngredientsTypeOptions[]
 	unitaire?: boolean
 	updated: IsoAutoDateString
 	valeurs?: null | Tvaleurs
@@ -148,6 +148,7 @@ export enum ProfessionnelsProfessionOptions {
 	"Naturopathe" = "Naturopathe",
 }
 export type ProfessionnelsRecord = {
+	certifie?: boolean
 	created: IsoAutoDateString
 	description?: string
 	id: string
