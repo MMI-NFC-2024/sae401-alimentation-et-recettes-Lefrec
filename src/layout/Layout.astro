@@ -13,9 +13,9 @@ const { titre, theme = "recette", filledFooter = "true" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>Cookoo - {titre}</title>
   </head>
-  <body class=`flex flex-col bg-${theme}-light bg-[url(/src/assets/svg/birds.svg)] bg-repeat bg-blend-multiply`>
+  <body class=`min-h-dvh flex flex-col bg-${theme}-light bg-[url(/src/assets/svg/birds.svg)] bg-repeat bg-blend-multiply`>
     <Header/>
-    <main class="min-h-dvh">
+    <main class="min-h-svh max-w-200 self-center">
       <slot />
     </main>
     <Footer fill={filledFooter}/>
