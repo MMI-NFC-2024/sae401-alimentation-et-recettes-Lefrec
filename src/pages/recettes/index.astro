@@ -70,7 +70,7 @@ const page = url.searchParams.get("page")
   : 1;
 const perPage = url.searchParams.get("perPage")
   ? Number(url.searchParams.get("perPage"))
-  : 10;
+  : 8;
 
 const recettes = await getRecettes({
   search,

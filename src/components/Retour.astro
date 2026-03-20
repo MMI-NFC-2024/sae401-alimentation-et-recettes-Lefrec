@@ -1,0 +1,10 @@
+---
+import Arrow from "../assets/svg/Arrow.svg";
+
+const {theme = "recette"} = Astro.props;
+---
+
+<a class:list=`centerflex px-2 py-1 w-fit rounded-full border-2 border-${theme}-dark` href="javascript:history.back()">
+    <Arrow class:list=`fill-${theme}-dark`/>
+    <span class=`font-semibold text-base text-${theme}-dark`>Retour</span>
+</a>

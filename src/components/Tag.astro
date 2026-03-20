@@ -1,0 +1,7 @@
+---
+const {content, theme = "recette"} = Astro.props;
+---
+
+<div class:list=`centerflex w-fit h-fit px-2 py-1 rounded-3xl border-2 border-${theme}-dark text-${theme}-dark`>
+    {content}
+</div>

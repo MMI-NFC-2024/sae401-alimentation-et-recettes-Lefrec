@@ -74,6 +74,7 @@ export async function getRecette(id: string) : Promise<Object | undefined> {
 
         const base = {
             id: recette.id,
+            nom: recette.nom,
             description: recette.description,
             imageURL: pb.files.getURL(recette, recette.image),
             preparation: recette.preparation,

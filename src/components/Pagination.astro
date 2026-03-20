@@ -9,7 +9,7 @@ const { currentPage, maxPages, theme = "recette" } = Astro.props;
     class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer"
     class:list={currentPage == 1 ? "bg-not-so-dark" : `bg-${theme}-dark`}
   >
-    <Arrow />
+    <Arrow class="fill-light"/>
   </button>
   <p class="text-base text-not-so-dark">{currentPage} sur {maxPages}</p>
   <button
@@ -17,7 +17,7 @@ const { currentPage, maxPages, theme = "recette" } = Astro.props;
     class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer"
     class:list={currentPage == maxPages ? "bg-not-so-dark" : `bg-${theme}-dark`}
   >
-    <Arrow class="-scale-x-100" />
+    <Arrow class="-scale-x-100 fill-light" />
   </button>
 </div>
 

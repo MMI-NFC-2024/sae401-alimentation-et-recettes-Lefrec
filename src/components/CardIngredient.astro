@@ -1,0 +1,22 @@
+---
+const { ingredient } = Astro.props;
+---
+
+<div class="centerflex gap-0 flex-col w-20">
+  <a href=`/ingredients/${ingredient.id}`>
+    <img
+      class="w-full object-cover rounded-full border border-not-so-light"
+      src={ingredient.imageURL}
+      alt=`Photo de ${ingredient.nom}`
+    />
+  </a>
+  <p
+    class="ingredient-quantite"
+    data-original-quantite={ingredient.quantite ?? 0}
+    data-unite={ingredient.unite ?? ""}
+  >
+    {ingredient.quantite}
+    {ingredient.unite}
+  </p>
+  <p class="text-xs font-light">{ingredient.nom}</p>
+</div>

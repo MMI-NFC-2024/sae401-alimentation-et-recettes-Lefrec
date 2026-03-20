@@ -29,10 +29,10 @@
         @apply font-heading;
     }
     h1 {
-        @apply text-3xl font-medium;
+        @apply text-3xl font-medium text-center;
     }
     h2 {
-        @apply text-lg font-medium;
+        @apply font-common text-lg font-medium;
     }
     h3 {
         @apply font-common text-base font-semibold text-center;

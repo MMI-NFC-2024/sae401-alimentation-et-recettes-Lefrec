@@ -1,0 +1,185 @@
+---
+import Layout from "../../layout/Layout.astro";
+import Retour from "../../components/Retour.astro";
+import Note from "../../components/Note.astro";
+import Tag from "../../components/Tag.astro";
+import CardIngredient from "../../components/CardIngredient.astro";
+import { getRecette } from "../../../backend/functions";
+import Knife from "../../assets/svg/Knife.svg";
+import Cook from "../../assets/svg/Cook.svg";
+import Calories from "../../assets/svg/Calories.svg";
+
+const { id } = Astro.params;
+
+const recette = await getRecette(id);
+
+console.log(recette);
+---
+
+<Layout theme="recette" titre={recette.nom} filledFooter="false">
+  <div class="flex flex-col w-full pt-5 gap-20">
+    <!-- Buttons -->
+    <div class="flex px-5 justify-between">
+      <Retour theme="recette" />
+    </div>
+    <article
+      class="centerflex flex-col w-full pt-2 pb-10 rounded-t-3xl bg-light"
+    >
+      <!-- Image -->
+      <div class="relative flex w-full justify-center max-w-100 h-50 p-1">
+        <img
+          class="absolute bottom-0"
+          src={recette.imageURL}
+          alt="Le plat en vue du dessus"
+        />
+      </div>
+      <!-- Content -->
+      <div class="centerflex flex-col gap-5 w-full">
+        <header class="centerflex flex-col px-5 gap-2">
+          <h1>{recette.nom}</h1>
+          <!-- Details -->
+          <div class="centerflex flex-col">
+            <!-- Auteur -->
+            <div class="centerflex">
+              <img
+                class="rounded-full size-8 object-cover"
+                src={recette.userImageURL}
+                alt="Photo de profil de l'auteur de la recette"
+              />
+              <p>{recette.userName}</p>
+            </div>
+            <!-- Note -->
+            <div class="centerflex">
+              <Note note={recette.note} />
+              <p class="font-light text-xs text-not-so-dark">
+                {recette.commentairesFixed.length} avis
+              </p>
+            </div>
+            <!-- Tags -->
+            <div class="centerflex w-full flex-wrap gap-2">
+              {recette.tags.map((tag) => <Tag content={tag} theme="recette" />)}
+            </div>
+          </div>
+          <!-- Description -->
+          <p class="text-base text-center">{recette.description}</p>
+        </header>
+        <!-- Bandeau -->
+        <div
+          class="flex justify-around items-center p-5 w-full bg-recette-dark text-light text-center"
+        >
+          <div class="flex items-center flex-col">
+            <Knife />
+            <p class="font-semibold">{recette.tempsPreparation} minutes</p>
+            <p>préparation</p>
+          </div>
+          <div class="flex items-center flex-col">
+            <Cook />
+            <p class="font-semibold">{recette.tempsCuisson} minutes</p>
+            <p>cuisson</p>
+          </div>
+          <div class="flex items-center flex-col">
+            <Calories />
+            <p class="font-semibold">{recette.valeurs.calories} kcal</p>
+            <p>par portion</p>
+          </div>
+        </div>
+        <!-- Ingrédients -->
+        <section class="flex flex-col w-full gap-2 px-5">
+          <div class="centerflex w-full">
+            <h2 class="w-full">Ingrédients</h2>
+            <!-- Portions -->
+            <div class="centerflex gap-2">
+              <button
+                id="less"
+                class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer text-light bg-recette-dark"
+                type="button"
+              >
+                -
+              </button>
+              <p id="portion-value" class="font-semibold">1</p>
+              <span>portion(s)</span>
+              <button
+                id="more"
+                class="centerflex rounded-full size-9 shadow-(--inside-shadow) cursor-pointer text-light bg-recette-dark"
+                type="button"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div class="centerflex flex-wrap">
+            {
+              recette.ingredientsFixed.map((ingredient) => (
+                <CardIngredient ingredient={ingredient} />
+              ))
+            }
+          </div>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <script type="module">
+    const MIN_PORTIONS = 1;
+    const MAX_PORTIONS = 20;
+
+    const lessBtn = document.querySelector("#less");
+    const moreBtn = document.querySelector("#more");
+    const portionValue = document.querySelector("#portion-value");
+    const ingredientElements = Array.from(
+      document.querySelectorAll(".ingredient-quantite"),
+    );
+
+    if (
+      !lessBtn ||
+      !moreBtn ||
+      !portionValue ||
+      ingredientElements.length === 0
+    ) {
+      // nothing to do if passive render
+    } else {
+      let portions = Number(portionValue.textContent?.trim() ?? 1);
+
+      const format = (value) => {
+        if (Number.isNaN(value) || !Number.isFinite(value)) return "0";
+        const rounded = Math.round(value * 100) / 100;
+        return Number.isInteger(rounded)
+          ? String(rounded)
+          : rounded
+              .toFixed(2)
+              .replace(/\.00$/, "")
+              .replace(/(\.\d)0$/, "$1");
+      };
+
+      const updatePortionButtons = () => {
+        lessBtn.classList.toggle("bg-not-so-dark", portions <= MIN_PORTIONS);
+        lessBtn.classList.toggle("bg-recette-dark", portions > MIN_PORTIONS);
+        moreBtn.classList.toggle("bg-not-so-dark", portions >= MAX_PORTIONS);
+        moreBtn.classList.toggle("bg-recette-dark", portions < MAX_PORTIONS);
+      };
+
+      const refreshIngredients = () => {
+        ingredientElements.forEach((el) => {
+          const base = Number(el.dataset.originalQuantite ?? 0);
+          const unit = el.dataset.unite ?? "";
+          const scaled = base * portions;
+          el.textContent = `${format(scaled)} ${unit}`.trim();
+        });
+        portionValue.textContent = String(portions);
+        updatePortionButtons();
+      };
+
+      lessBtn.addEventListener("click", () => {
+        portions = Math.max(MIN_PORTIONS, portions - 1);
+        refreshIngredients();
+      });
+
+      moreBtn.addEventListener("click", () => {
+        portions = Math.min(MAX_PORTIONS, portions + 1);
+        refreshIngredients();
+      });
+
+      refreshIngredients();
+    }
+  </script>
+</Layout>
