@@ -9,6 +9,7 @@ import Knife from "../../assets/svg/Knife.svg";
 import Cook from "../../assets/svg/Cook.svg";
 import Calories from "../../assets/svg/Calories.svg";
 import Arrow from "../../assets/svg/Arrow.svg";
+import CardNotes from "../../components/CardNotes.astro";
 
 const { id } = Astro.params;
 
@@ -166,6 +167,11 @@ console.log(recette);
                     <p class="font-bold">{recette.valeurs.fibres} g</p>
                 </div>
             </div>
+        </section>
+        <!-- Avis -->
+        <section class="flex flex-col w-full gap-2 px-5">
+            <h2>Avis</h2>
+            <CardNotes commentaires={recette.commentairesFixed} note={recette.note}/>
         </section>
       </div>
     </article>
