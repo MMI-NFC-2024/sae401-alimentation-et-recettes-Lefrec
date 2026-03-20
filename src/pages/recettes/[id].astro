@@ -10,6 +10,7 @@ import Cook from "../../assets/svg/Cook.svg";
 import Calories from "../../assets/svg/Calories.svg";
 import Arrow from "../../assets/svg/Arrow.svg";
 import CardNotes from "../../components/CardNotes.astro";
+import CardCommentaire from "../../components/CardCommentaire.astro";
 
 const { id } = Astro.params;
 
@@ -172,6 +173,12 @@ console.log(recette);
         <section class="flex flex-col w-full gap-2 px-5">
             <h2>Avis</h2>
             <CardNotes commentaires={recette.commentairesFixed} note={recette.note}/>
+            <div class="flex flex-col w-full gap-4 pt-5">
+                {recette.commentairesFixed.map((commentaire) => ( 
+                    <CardCommentaire commentaire={commentaire}/>
+                ))}
+            </div>
+            
         </section>
       </div>
     </article>
