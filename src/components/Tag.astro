@@ -1,7 +1,14 @@
 ---
-const {content, theme = "recette"} = Astro.props;
+const { content, theme = "recette" } = Astro.props;
 ---
 
-<div class:list=`centerflex w-fit h-fit px-2 py-1 rounded-3xl border-2 border-${theme}-dark text-${theme}-dark`>
-    {content}
+<div
+  class=`centerflex w-fit h-fit px-2 py-1 rounded-3xl border-2`
+  class:list={[
+    (theme == "recette") ? `text-recette-dark border-recette-dark` : "",
+    (theme == "pro") ? `text-pro-dark border-pro-dark` : "", 
+    (theme == "regime") ? `text-regime-dark border-regime-dark` : "", 
+  ]}
+>
+  {content}
 </div>

@@ -8,6 +8,7 @@ import { getRecette } from "../../../backend/functions";
 import Knife from "../../assets/svg/Knife.svg";
 import Cook from "../../assets/svg/Cook.svg";
 import Calories from "../../assets/svg/Calories.svg";
+import Arrow from "../../assets/svg/Arrow.svg";
 
 const { id } = Astro.params;
 
@@ -115,11 +116,62 @@ console.log(recette);
             }
           </div>
         </section>
+        <!-- Préparation -->
+        <section class="flex flex-col w-full gap-2 px-5">
+            <h2>Recette</h2>
+            {recette.preparation.map((etape, index) => (
+                <div class="flex flex-col w-full">
+                    <p class="text-xs text-not-so-dark">Étape {index+1}</p>
+                    <p class="font-medium text-base">{etape}</p>
+                </div>
+            ))}
+        </section>
+        <!-- Valeurs -->
+        <section class="flex flex-col gap-5 p-5 w-full bg-recette-dark">
+            <div class="flex w-full justify-between items-center">
+                <div class="flex flex-col gap-0">
+                    <h2 class="text-light">Valeurs nutritionnelles</h2>
+                    <p class="text-not-so-light">Valeurs estimées moyenne pour une portion</p>
+                </div>
+                <Arrow id="valeursArrow" class="fill-light rotate-90"/>
+            </div>
+            <!-- Valeurs -->
+            <div id="valeurs" class="flex flex-col gap-2 w-full text-light">
+                <div class="flex w-full justify-between">
+                    <p>Calories</p>
+                    <p class="font-bold">{recette.valeurs.calories} kcal</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Matières grasses</p>
+                    <p class="font-bold">{recette.valeurs.gras} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Glucides</p>
+                    <p class="font-bold">{recette.valeurs.glucides} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Protéines</p>
+                    <p class="font-bold">{recette.valeurs.proteines} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Fibres</p>
+                    <p class="font-bold">{recette.valeurs.fibres} g</p>
+                </div>
+            </div>
+        </section>
       </div>
     </article>
   </div>
 
-  <script type="module">
+  <script>
     const MIN_PORTIONS = 1;
     const MAX_PORTIONS = 20;
 
@@ -182,4 +234,28 @@ console.log(recette);
       refreshIngredients();
     }
   </script>
+
+  <script>
+    const arrow = document.getElementById("valeursArrow");
+    const valeurs = document.getElementById("valeurs");
+
+    let opened = true;
+
+    if (arrow && valeurs) {
+        arrow.addEventListener("click", () => {
+            if (opened) {
+                opened = false;
+                arrow.classList.add("-rotate-90");
+                arrow.classList.remove("rotate-90");
+                valeurs.classList.add("hidden");
+            } else {
+                opened = true;
+                arrow.classList.add("rotate-90");
+                arrow.classList.remove("-rotate-90");
+                valeurs.classList.remove("hidden");
+            }
+        })
+    }
+  </script>
 </Layout>
+

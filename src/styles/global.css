@@ -38,7 +38,7 @@
         @apply font-common text-base font-semibold text-center;
     }
     p {
-        @apply font-common text-sm;
+        @apply font-common text-base;
     }
     input {
         @apply outline-none;

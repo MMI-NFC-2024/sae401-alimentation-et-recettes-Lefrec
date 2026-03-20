@@ -4,7 +4,14 @@ import Arrow from "../assets/svg/Arrow.svg";
 const {theme = "recette"} = Astro.props;
 ---
 
-<a class:list=`centerflex px-2 py-1 w-fit rounded-full border-2 border-${theme}-dark` href="javascript:history.back()">
-    <Arrow class:list=`fill-${theme}-dark`/>
-    <span class=`font-semibold text-base text-${theme}-dark`>Retour</span>
+<a 
+  class=`centerflex px-2 py-1 w-fit rounded-full border-2`
+  class:list={[
+    (theme == "recette") ? `text-recette-dark border-recette-dark fill-recette-dark` : "",
+    (theme == "pro") ? `text-pro-dark border-pro-dark fill-pro-dark` : "", 
+    (theme == "regime") ? `text-regime-dark border-regime-dark fill-regime-dark` : "", 
+  ]}
+  href="javascript:history.back()">
+    <Arrow/>
+    <span class=`font-semibold text-base`>Retour</span>
 </a>
