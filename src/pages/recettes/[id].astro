@@ -15,8 +15,6 @@ import CardCommentaire from "../../components/CardCommentaire.astro";
 const { id } = Astro.params;
 
 const recette = await getRecette(id);
-
-console.log(recette);
 ---
 
 <Layout theme="recette" titre={recette.nom} filledFooter="false">

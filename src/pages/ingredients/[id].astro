@@ -1,0 +1,122 @@
+---
+import Layout from "../../layout/Layout.astro";
+import Retour from "../../components/Retour.astro";
+import Tag from "../../components/Tag.astro";
+import Arrow from "../../assets/svg/Arrow.svg";
+import CardRecette from "../../components/CardRecette.astro";
+import { getIngredient, getRecettes } from "../../../backend/functions";
+
+const { id } = Astro.params;
+
+const ingredient = await getIngredient(id);
+
+const recettes = await getRecettes({ingredients : [ingredient.id]});
+---
+
+<Layout theme="recette" titre={ingredient.nom} filledFooter="false">
+  <div class="flex flex-col w-full pt-5 gap-20">
+    <!-- Buttons -->
+    <div class="flex px-5 justify-between">
+      <Retour theme="recette" />
+    </div>
+    <article
+      class="centerflex flex-col w-full pt-2 pb-10 rounded-t-3xl bg-light"
+    >
+      <!-- Image -->
+      <div class="relative flex w-full justify-center max-w-100 h-50 p-1">
+        <img
+          class="absolute bottom-0"
+          src={ingredient.imageURL}
+          alt="Le plat en vue du dessus"
+        />
+      </div>
+      <!-- Content -->
+      <div class="centerflex flex-col gap-5 w-full">
+        <header class="centerflex flex-col px-5 gap-2">
+          <h1>{ingredient.nom}</h1>
+          <!-- Details -->
+          <div class="centerflex flex-col">
+            <!-- Tags -->
+            <div class="centerflex w-full flex-wrap gap-2">
+              <Tag content={ingredient.type} theme="recette" />
+            </div>
+          </div>
+          <!-- Description -->
+          <!-- <p class="text-base text-center">{ingredient.description}</p> -->
+        </header>
+        <!-- Valeurs -->
+        <section class="flex flex-col gap-5 p-5 w-full bg-recette-dark">
+            <div class="flex w-full justify-between items-center">
+                <div class="flex flex-col gap-0">
+                    <h2 class="text-light">Valeurs nutritionnelles</h2>
+                    <p class="text-not-so-light">Valeurs estimées moyenne pour 100 g</p>
+                </div>
+                <Arrow id="valeursArrow" class="fill-light rotate-90"/>
+            </div>
+            <!-- Valeurs -->
+            <div id="valeurs" class="flex flex-col gap-2 w-full text-light">
+                <div class="flex w-full justify-between">
+                    <p>Calories</p>
+                    <p class="font-bold">{ingredient.valeurs.calories} kcal</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Matières grasses</p>
+                    <p class="font-bold">{ingredient.valeurs.gras} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Glucides</p>
+                    <p class="font-bold">{ingredient.valeurs.glucides} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Protéines</p>
+                    <p class="font-bold">{ingredient.valeurs.proteines} g</p>
+                </div>
+                <!-- Line -->
+                <div class="bg-light w-full h-px"></div>
+                <div class="flex w-full justify-between">
+                    <p>Fibres</p>
+                    <p class="font-bold">{ingredient.valeurs.fibres} g</p>
+                </div>
+            </div>
+        </section>
+        <section class="flex flex-col w-full gap-2 px-5">
+            <h2>Recettes</h2>
+            <div class="flex gap-5 w-full py-2 overflow-x-scroll noscrollbar">
+                {recettes.map((recette) => {
+                    return <CardRecette {...recette} />;
+                })}
+            </div>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <script>
+    const arrow = document.getElementById("valeursArrow");
+    const valeurs = document.getElementById("valeurs");
+
+    let opened = true;
+
+    if (arrow && valeurs) {
+        arrow.addEventListener("click", () => {
+            if (opened) {
+                opened = false;
+                arrow.classList.add("-rotate-90");
+                arrow.classList.remove("rotate-90");
+                valeurs.classList.add("hidden");
+            } else {
+                opened = true;
+                arrow.classList.add("rotate-90");
+                arrow.classList.remove("-rotate-90");
+                valeurs.classList.remove("hidden");
+            }
+        })
+    }
+  </script>
+</Layout>

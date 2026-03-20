@@ -232,9 +232,10 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
 }
 }
 
-export async function getIngredient(id: string) : Promise<IngredientsResponse | undefined> {
+export async function getIngredient(id: string) : Promise<Object | undefined> {
     try {
-        const ingredient = await pb.collection("Ingredients").getOne(id);
+        let ingredient = await pb.collection("Ingredients").getOne(id);
+        ingredient.imageURL = pb.files.getURL(ingredient, ingredient.image);
         console.log("[getIngredient] Got ingredient :",JSON.stringify(ingredient, null, 2));
         return ingredient;
     } catch (e) {
