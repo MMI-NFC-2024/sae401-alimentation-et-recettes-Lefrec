@@ -1,0 +1,90 @@
+---
+import Layout from "../../layout/Layout.astro";
+import Retour from "../../components/Retour.astro";
+import Note from "../../components/Note.astro";
+import Tag from "../../components/Tag.astro";
+import CardNotes from "../../components/CardNotes.astro";
+import CardCommentaire from "../../components/CardCommentaire.astro";
+import CardRecette from "../../components/CardRecette.astro";
+import Certif from "../../assets/svg/certif.svg";
+
+import { getProfessionnel, getRecettesByPro } from "../../../backend/functions";
+
+const { id } = Astro.params;
+
+const professionnel = await getProfessionnel(id);
+
+const recettes = await getRecettesByPro(professionnel.userId);
+---
+
+<Layout theme="pro" titre=`${professionnel.prenom} ${professionnel.nom}` filledFooter="false">
+  <div class="flex flex-col w-full pt-5 gap-20">
+    <!-- Buttons -->
+    <div class="flex px-5 justify-between">
+      <Retour theme="pro" />
+    </div>
+    <article
+      class="centerflex flex-col w-full pt-2 pb-10 rounded-t-3xl bg-light"
+    >
+      <div class="flex w-full justify-between pl-5 pr-2">
+        <!-- AvatarHolder -->
+        <div class="relative w-30 h-15">
+          <img
+            class="absolute w-30 h-30 object-cover bottom-0 rounded-full"
+            src={professionnel.imageURL}
+            alt="Avatar de profil"
+          />
+        </div>
+        <!-- CTA -->
+        <div
+          class="centerflex p-2.5 w-fit h-fit rounded-full bg-pro-dark shadow-(--base-shadow) hover:scale-105 transition-transform duration-100 ease-in-out"
+        >
+          <a class="text-light text-lg font-semibold" href={professionnel.lien} target="_blank"
+            >Contacter</a
+          >
+        </div>
+      </div>
+      <div class="centerflex flex-col gap-5 w-full">
+        <section class="flex flex-col w-full gap-2 px-5">
+          <div class="centerflex w-fit">
+            <h2 class="font-bold">
+              {professionnel.prenom}
+              {professionnel.nom}
+            </h2>
+            <Certif class:list={professionnel?.certifie ? "" : "hidden"} />
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {
+              professionnel.professions.map((profession) => (
+                <Tag content={profession} theme="pro" />
+              ))
+            }
+          </div>
+          <p>{professionnel.description}</p>
+        </section>
+        <!-- Recettes -->
+        <section class="flex flex-col w-full gap-2 px-5" class:list={(recettes?.length == 0 ? "hidden" : "")}>
+          <h2>Recettes</h2>
+          <div class="flex gap-5 w-full py-2 overflow-x-scroll noscrollbar">
+            {
+              recettes.map((recette) => {
+                return <CardRecette {...recette} />;
+              })
+            }
+          </div>
+        </section>
+        <!-- Avis -->
+        <section class="flex flex-col w-full gap-2 px-5">
+            <h2>Avis</h2>
+            <CardNotes commentaires={professionnel.commentairesFixed} note={professionnel.note}/>
+            <div class="flex flex-col w-full gap-4 pt-5">
+                {professionnel.commentairesFixed.map((commentaire) => ( 
+                    <CardCommentaire commentaire={commentaire}/>
+                ))}
+            </div>
+            
+        </section>
+      </div>
+    </article>
+  </div>
+</Layout>

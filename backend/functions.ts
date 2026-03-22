@@ -232,6 +232,55 @@ export async function getRecettes(filters: RecetteFilter = {}): Promise<RecetteL
 }
 }
 
+export async function getRecettesByPro(id: string): Promise<RecetteListItem[] | undefined> {
+    try {
+        const recettes = await pb.collection("Recettes").getFullList({filter : `user = '${id}'`});
+
+        const recetteFilter = recettes.map((recette) => `recette = '${recette.id}'`).join("||")
+        const contientRecords = await pb.collection('Contient').getFullList({ filter: recetteFilter, expand: 'ingredient' });
+        const commentaireRecords = await pb.collection('Commentaires').getFullList({ filter: recetteFilter });
+
+        const contientsByRecette = new Map<string, any[]>();
+        contientRecords.forEach((c: any) => {
+            const list = contientsByRecette.get(c.recette) ?? [];
+            list.push(c);
+            contientsByRecette.set(c.recette, list);
+        });
+
+        const commentairesByRecette = new Map<string, any[]>();
+        commentaireRecords.forEach((c: any) => {
+            const list = commentairesByRecette.get(c.recette) ?? [];
+            list.push(c);
+            commentairesByRecette.set(c.recette, list);
+        });
+
+        const result: RecetteListItem[] = recettes.map((r: any) => {
+            const temps = (r.tempsPreparation ?? 0) + (r.tempsCuisson ?? 0);
+
+            const calories = calculateNutritionValues(
+                (contientsByRecette.get(r.id) ?? []).map(normalizeIngredient),
+            ).calories;
+
+            const note = calculateNote(commentairesByRecette.get(r.id) ?? []);
+
+            return {
+                id: r.id,
+                imageURL: pb.files.getURL(r, r.image),
+                nom: r.nom,
+                niveau: r.niveau,
+                temps,
+                calories,
+                note,
+            };
+        });
+
+        return result;
+    } catch (e) {
+        console.log("[getRecettesByPro] failed :", e);
+        return;
+    }
+}
+
 export async function getIngredient(id: string) : Promise<Object | undefined> {
     try {
         let ingredient = await pb.collection("Ingredients").getOne(id);
@@ -251,12 +300,13 @@ export async function getProfessionnel(id: string) : Promise<Object | undefined>
 
         const base = {
             id: professionnel.id,
+            userId: user.id,
             imageURL: pb.files.getURL(user, user.avatar),
             nom: professionnel.nom,
             prenom: professionnel.prenom,
             description: professionnel.description,
             lien: professionnel.lien,
-            profession: professionnel.profession,
+            professions: professionnel.professions,
             certifie: professionnel.certifie,
         };
 

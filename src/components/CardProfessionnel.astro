@@ -10,8 +10,9 @@ interface Props {
   professions: Array<string>;
   imageURL: string;
   note: number;
+  certifie: boolean;
 }
-const { id, nom, prenom, imageURL, description, professions, note } = Astro.props;
+const { id, nom, prenom, imageURL, description, professions, note, certifie } = Astro.props;
 ---
 
 <article
@@ -22,7 +23,7 @@ const { id, nom, prenom, imageURL, description, professions, note } = Astro.prop
     <header class="centerflex gap-1">
         <h3 class="w-full text-left">{prenom} {nom}</h3>
         <Note note={note}/>
-        <Certif />
+        <Certif class:list={certifie ? "" : "hidden"}/>
     </header>
     <p class="line-clamp-2">{description}</p>
   </a>
