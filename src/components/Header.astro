@@ -2,6 +2,14 @@
 import App from "../assets/svg/App.svg";
 import Play from "../assets/svg/Play.svg";
 import Bird from "../assets/svg/big-bird.svg";
+import { getUser } from "../../backend/functions";
+
+let user;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+  user.email = Astro.locals.pb.authStore.record.email;
+}
 ---
 
 <header class="relative">
@@ -65,16 +73,24 @@ import Bird from "../assets/svg/big-bird.svg";
       <a href="/regime">Mon régime</a>
     </div>
     <!-- connection -->
-    <div class="centerflex flex-col">
-      <div
-        class="btn"
-      >
-        <a class="btnText" href="/auth">Connexion</a>
+     { user ? ( 
+      <a href="/profile" class="centerflex">
+        <img class="size-10 rounded-full object-cover" src={user.imageURL || "/avatar.png"} alt="Ta photo de profil">
+        <p>{user.name}</p>
+      </a>
+     ) : (
+      <div class="centerflex flex-col">
+        <div
+          class="btn"
+        >
+          <a class="btnText" href="/auth">Connexion</a>
+        </div>
+        <a class="text-not-so-dark text-base font-medium hover:underline" href="/register"
+          >Créer un compte</a
+        >
       </div>
-      <a class="text-not-so-dark text-base font-medium hover:underline" href="/register"
-        >Créer un compte</a
-      >
-    </div>
+     )}
+    
     <!-- space -->
     <div class="relative h-full">
       <Bird class="absolute right-0 bottom-0" />

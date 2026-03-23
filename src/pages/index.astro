@@ -3,7 +3,15 @@ import Layout from "../layout/Layout.astro";
 import PinkBird from "../assets/svg/PinkBird.svg";
 import CardRecette from "../components/CardRecette.astro";
 import CardProfessionnel from "../components/CardProfessionnel.astro";
-import { getRecettes, getProfessionnels } from "../../backend/functions";
+import { getRecettes, getProfessionnels, getUser } from "../../backend/functions";
+
+let user;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+  user.email = Astro.locals.pb.authStore.record.email;
+}
+
 
 const recettes = await getRecettes();
 const recettesSliced = recettes?.slice(0,3);
@@ -23,11 +31,15 @@ console.log(professionnelsSliced)
         <h1 class="font-logo text-5xl">Cookoo,</h1>
         <p class="font-light text-xl">mon compagnon nutrition</p>
       </div>
-      <div class="flex w-full justify-end px-5">
+      { user ? ( 
+        ""
+      ) : (
+        <div class="flex w-full justify-end px-5">
         <div class="btn">
           <a class="btnText" href="/auth">Connexion</a>
         </div>
       </div>
+      )}
     </div>
     <!-- Article -->
     <article
