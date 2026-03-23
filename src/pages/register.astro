@@ -48,7 +48,7 @@ if (Astro.request.method === "POST") {
           <div class="centerflex flex-col">
             <div class="centerflex">
                 <img class="size-10 rounded-full object-cover" src={user.imageURL || "/avatar.png"} alt="Avatar de l'utilisateur">
-                <p>Tu es déjà connecté en tant que <span class="text-gold font-semibold">{user.name}</span></p>
+                <p>Tu es déjà connecté en tant que <a href="/profile" class="text-gold font-semibold">{user.name}</a></p>
             </div>
             <p class="text-center text-sm">Déconnecte toi pour créer un nouveau compte</p>
             <form method="post">
