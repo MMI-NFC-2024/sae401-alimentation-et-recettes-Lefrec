@@ -6,7 +6,7 @@ const { ingredient } = Astro.props;
   <a href=`/ingredients/${ingredient.id}`>
     <img
       class="w-full object-cover rounded-full border border-not-so-light"
-      src={ingredient.imageURL}
+      src={ingredient.imageURL || "/placeholder.png"}
       alt=`Photo de ${ingredient.nom}`
     />
   </a>
@@ -18,5 +18,5 @@ const { ingredient } = Astro.props;
     {ingredient.quantite}
     {ingredient.unite}
   </p>
-  <p class="text-xs font-light">{ingredient.nom}</p>
+  <p class="text-xs font-light text-center">{ingredient.nom}</p>
 </div>

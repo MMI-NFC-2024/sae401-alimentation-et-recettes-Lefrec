@@ -18,7 +18,7 @@ const { id, nom, prenom, imageURL, description, professions, note, certifie } = 
 <article
   class="flex w-full p-2 gap-2 rounded-xl rounded-l-[100px] bg-light shadow-(--base-shadow)"
 >
-  <img class="size-20 min-w-20 rounded-full object-cover" src={imageURL} alt="Photo de profil du professionnel">
+  <img class="size-20 min-w-20 rounded-full object-cover" src={imageURL || "/avatar.png"} alt="Photo de profil du professionnel">
   <a href=`/professionnels/${id}` class="flex flex-col w-full gap-1">
     <header class="centerflex gap-1">
         <h3 class="w-full text-left">{prenom} {nom}</h3>

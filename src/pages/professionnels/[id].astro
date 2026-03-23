@@ -31,7 +31,7 @@ const recettes = await getRecettesByPro(professionnel.userId);
         <div class="relative w-30 h-15">
           <img
             class="absolute w-30 h-30 object-cover bottom-0 rounded-full"
-            src={professionnel.imageURL}
+            src={professionnel.imageURL || "/avatar.png"}
             alt="Avatar de profil"
           />
         </div>

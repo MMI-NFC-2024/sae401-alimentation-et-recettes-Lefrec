@@ -61,7 +61,7 @@ export async function getUser(id: string) : Promise<Object | undefined> {
         const user = await pb.collection("users").getOne(id);
         const imageURL = pb.files.getURL(user, user.avatar);
 
-        console.log("[getUser] Got user :",JSON.stringify(user, null, 2));
+        console.log("[getUser] Got user :",JSON.stringify({...user, imageURL}, null, 2));
 
         return {...user, imageURL};
     } catch (e) {

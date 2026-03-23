@@ -20,7 +20,7 @@ const { id, nom, imageURL, niveau, temps, calories, note } = Astro.props;
     <div class="relative flex w-fill p-1 h-20">
       <img
         class="absolute bottom-0"
-        src={imageURL}
+        src={imageURL || "/placeholder.png"}
         alt="La recette présentée dans une assiette vu du dessus"
       />
     </div>

@@ -47,8 +47,8 @@ if (Astro.request.method === "POST") {
         Astro.locals.pb.authStore.isValid ? (
           <div class="centerflex flex-col">
             <div class="centerflex">
-            <img class="size-10 rounded-full object-cover" src={user.imageURL} alt="Avatar de l'utilisateur">
-            <p>Tu es déjà connecté en tant que <span class="text-gold font-semibold">{user.name}</span></p>
+                <img class="size-10 rounded-full object-cover" src={user.imageURL || "/avatar.png"} alt="Avatar de l'utilisateur">
+                <p>Tu es déjà connecté en tant que <span class="text-gold font-semibold">{user.name}</span></p>
             </div>
             <p class="text-center text-sm">Déconnecte toi pour créer un nouveau compte</p>
             <form method="post">

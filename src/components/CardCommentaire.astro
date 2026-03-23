@@ -7,7 +7,7 @@ const { commentaire } = Astro.props;
 <div class="flex flex-col gap-2 w-full border border-not-so-light rounded-xl p-2">
     <div class="flex w-full justify-between">
         <div class="flex gap-2 items-center">
-            <img class="size-8 rounded-full" src={commentaire.imageURL} alt="Photo de profil de l'utilisateur">
+            <img class="size-8 rounded-full" src={commentaire.imageURL || "/avatar.png"} alt="Photo de profil de l'utilisateur">
             <p class="text-not-so-dark text-sm">{commentaire.name}</p>
         </div>
         <Note note={commentaire.note}/>

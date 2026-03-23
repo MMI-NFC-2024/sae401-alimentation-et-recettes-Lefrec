@@ -30,7 +30,7 @@ const recette = await getRecette(id);
       <div class="relative flex w-full justify-center max-w-100 h-50 p-1">
         <img
           class="absolute bottom-0"
-          src={recette.imageURL}
+          src={recette.imageURL || "/placeholder.png"}
           alt="Le plat en vue du dessus"
         />
       </div>
@@ -44,7 +44,7 @@ const recette = await getRecette(id);
             <div class="centerflex">
               <img
                 class="rounded-full size-8 object-cover"
-                src={recette.userImageURL}
+                src={recette.userImageURL || "/avatar.png"}
                 alt="Photo de profil de l'auteur de la recette"
               />
               <p>{recette.userName}</p>
