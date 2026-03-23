@@ -70,6 +70,16 @@ export async function getUser(id: string) : Promise<Object | undefined> {
     }
 }
 
+export async function getObjectif(id: string) : Promise<Object | undefined> {
+    try {
+        const objectifs = await pb.collection("Objectifs").getFullList({filter : `user = '${id}'`, sort : 'created'});
+        return objectifs[0];
+    } catch (e) {
+        console.log("[getObjectif] Failed",e);
+        return e;
+    }
+}
+
 export async function getRecette(id: string) : Promise<Object | undefined> {
     try {
         const recette = await pb.collection("Recettes").getOne(id, { expand: "user" });

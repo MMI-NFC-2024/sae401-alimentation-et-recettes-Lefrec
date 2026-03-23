@@ -91,14 +91,14 @@ if (Astro.request.method === "POST") {
     </div>
     { user ? (
         <div id="form" class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow) hidden">
-            <form class="centerflex flex-col w-full" method="post" enctype="multipart/form-data" submit="prevent">
-                <label class="label">
+            <form class="centerflex flex-col w-full" method="post" enctype="multipart/form-data">
+                <label class="label w-full">
               <input type="text" name="name" placeholder="Pseudonyme" value={user.name}/>
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input type="email" name="email" placeholder="Email" value={user.email}/>
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input
                 type="password"
                 name="password"
@@ -106,7 +106,7 @@ if (Astro.request.method === "POST") {
                 placeholder="Nouveau mot de passe"
               />
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input
                 type="password"
                 name="passwordConfirm"
@@ -114,7 +114,7 @@ if (Astro.request.method === "POST") {
                 placeholder="Confimer le nouveau mot de passe"
               />
             </label>
-            <label class="label">
+            <label class="label w-full">
                 Avatar
               <input
                 type="file"

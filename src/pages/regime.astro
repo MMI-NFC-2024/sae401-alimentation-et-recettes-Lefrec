@@ -1,9 +1,183 @@
 ---
 import Layout from "../layout/Layout.astro";
+import Target from "../assets/svg/target.svg";
+import Weight from "../assets/svg/weight.svg";
+import Meal from "../assets/svg/meal.svg";
+import Date from "../assets/svg/date.svg";
+import Calories from "../assets/svg/Calories.svg";
+import { getUser, getObjectif } from "../../backend/functions";
+import { object } from "astro:schema";
+
+let user;
+let objectif;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+  user.email = Astro.locals.pb.authStore.record.email;
+  objectif = await getObjectif(user.id);
+} 
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const raison = data.get("raison") || "" as string;
+  const regime = data.get("regime") || "" as string;
+  const poids = data.get("poids") || 0 as number;
+  const apport = data.get("apport") || 0 as number;
+  const date = data.get("data");
+  try {
+    if (objectif) {
+      await Astro.locals.pb.collection("Objectifs").update(objectif.id, {raison, regime, poids, apport, date});
+    } else {
+      await Astro.locals.pb.collection("Objectifs").create({user, raison, regime, poids, apport, date});
+    }
+    return Astro.redirect("/regime");
+  } catch (e) {
+    console.log(e);
+  }
+  
+}
 ---
 
 <Layout theme="regime" titre="Mon compagnion nutrition" filledFooter="false">
-   <div class="centerflex flex-col gap-5 px-5 py-10 w-full">
+  <div class="centerflex flex-col gap-5 px-5 py-10 w-full">
     <h1>Mon régime</h1>
+    <div class="centerflex flex-col p-5 w-full self-center">
+    {
+      user ? (
+        <div class="relative flex flex-col p-5 gap-5 w-full bg-light rounded-3xl shadow-(--base-shadow)">
+          <h2>Mes objectifs</h2>
+          {/* Objectifs */}
+          { objectif ? (
+            <div class="centerflex flex-wrap justify-around gap-4">
+            {/* Raison */}
+            { objectif.raison ? (
+              <div class="centerflex flex-col">
+                <p class="text-xs text-not-so-dark">Faire</p>
+                <Target class="fill-regime-dark size-10" />
+                <p>{objectif.raison}</p>
+              </div>
+            ) : ""}
+            {/* Régime */}
+            { objectif.regime ? (
+              <div class="centerflex flex-col">
+                <p class="text-xs text-not-so-dark">Manger</p>
+                <Meal class="fill-regime-dark size-10" />
+                <p>{objectif.regime}</p>
+              </div>
+            ) : ""}
+            {/* Poids */}
+            { objectif.poids ? (
+              <div class="centerflex flex-col">
+                <p class="text-xs text-not-so-dark">Peser</p>
+                <Weight class="fill-regime-dark size-10" />
+                <p>{objectif.poids} kg</p>
+              </div>
+            ) : ""}
+            {/* Apport */}
+            { objectif.apport ? (
+              <div class="centerflex flex-col">
+                <p class="text-xs text-not-so-dark">Consommer</p>
+                <Calories class="fill-regime-dark size-10" />
+                <p>{objectif.apport} kcal</p>
+              </div>
+            ) : ""}
+            {/* Date */}
+            { objectif.date ? (
+              <div class="centerflex flex-col">
+                <p class="text-xs text-not-so-dark">Avant</p>
+                <Date class="fill-regime-dark size-10" />
+                <p>{objectif.date.split(" ")[0]}</p>
+              </div>
+            ) : ""}
+            </div>
+          ) : (
+            <div class="centerflex flex-col">
+              <p>Tu n'as pas encore définis tes objectifs</p>
+              <button id="ajouterObj" class="btn btnText bg-regime-dark">Définir mes objectifs</button>
+            </div>
+          )}
+          {objectif ? (<button id="modifierObj" class="btn btnText bg-regime-dark self-end">Modifier</button>) : ("")}
+          <div id="formObj" class="hidden">
+            <form class="centerflex flex-col" method="post">
+              <div class="centerflex flex-wrap">
+              <label class="label">
+                <select name="raison">
+                  <option value="">-- Raison --</option>
+                  <option value="Rééquilibrage alimentaire">Rééquilibrage alimentaire</option>
+                  <option value="Prise de poids">Prise de poids</option>
+                  <option value="Perte de poids">Perte de poids</option>
+                </select>
+              </label>
+              <label class="label">
+                <select name="regime">
+                  <option value="">-- Régime --</option>
+                  <option value="Omnivore">Omnivore</option>
+                  <option value="Flexitarien">Flexitarien</option>
+                  <option value="Végétarien">Végétarien</option>
+                  <option value="Végan">Végan</option>
+                  <option value="Sans porc">Sans porc</option>
+                </select>
+              </label>
+              <label class="label">
+                Poids cible
+                <input type="number" name="poids" value={objectif.poids}>
+              </label>
+              <label class="label">
+                Apport calorique
+                <input type="number" name="apport" value={objectif.apport}>
+              </label>
+              <label class="label">
+                Date cible
+                <input type="date" name="date" value={objectif.date}>
+              </label>
+              </div>
+              <div class="centerflex self-end">
+                <button id="supprimerObj" class="btn btnText bg-regime-light">Supprimer mes objectifs</button>
+                <button type="submit" class="btn btnText bg-regime-dark">Valider</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <div class="flex flex-col p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow)">
+          <p class="text-center">
+            Impossible d'afficher votre profil car vous n'êtes pas connecté
+          </p>
+          <div class="centerflex justify-around">
+            <p class="text-sm">Vous n'avez pas de compte ?</p>
+            <a class="text-sm text-gold font-semibold" href="/register">
+              Créer un compte
+            </a>
+          </div>
+          <div class="centerflex justify-around">
+            <p class="text-sm">Vous avez déjà un compte ?</p>
+            <a class="text-sm text-gold font-semibold" href="/auth">
+              Se connecter
+            </a>
+          </div>
+        </div>
+      )
+    }
+    </div>
   </div>
+
+  <script>
+    const formObj = document.getElementById("formObj") as HTMLFormElement;
+    const modifierObj = document.getElementById("modifierObj") as HTMLButtonElement;
+    const ajouterObj = document.getElementById("ajouterObj") as HTMLButtonElement;
+    const supprimerObj = document.getElementById("supprimerObj") as HTMLButtonElement;
+
+    let opened = false;
+
+    if (formObj && modifierObj) {
+        modifierObj.addEventListener("click", () => {
+            if (opened) {
+                formObj.classList.add("hidden");
+            } else {
+                formObj.classList.remove("hidden");
+            }
+            opened = !opened;
+        })
+    }
+  </script>
 </Layout>

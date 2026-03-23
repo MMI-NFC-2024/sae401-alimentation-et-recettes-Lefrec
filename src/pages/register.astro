@@ -59,13 +59,13 @@ if (Astro.request.method === "POST") {
           </div>
         ) : (
           <form class="centerflex flex-col w-full" method="post" enctype="multipart/form-data">
-            <label class="label">
+            <label class="label w-full">
               <input type="text" name="name" placeholder="Pseudonyme" required/>
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input type="email" name="email" placeholder="Email" required/>
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input
                 type="password"
                 name="password"
@@ -74,7 +74,7 @@ if (Astro.request.method === "POST") {
                 required
               />
             </label>
-            <label class="label">
+            <label class="label w-full">
               <input
                 type="password"
                 name="passwordConfirm"
@@ -83,7 +83,7 @@ if (Astro.request.method === "POST") {
                 required
               />
             </label>
-            <label class="label">
+            <label class="label w-full">
                 Avatar
               <input
                 type="file"
