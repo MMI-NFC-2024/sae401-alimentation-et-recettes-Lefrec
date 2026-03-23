@@ -52,6 +52,12 @@
     .centerflex {
         @apply flex justify-center items-center gap-2;
     }
+    .btn {
+        @apply flex w-fit h-fit p-2.5 rounded-full bg-gold hover:scale-105 transition-transform duration-100 ease-in-out;
+    }
+    .btnText {
+        @apply text-light text-lg font-semibold;
+    }
     .noscrollbar {
         -ms-overflow-style: none;  /* Internet Explorer 10+ */
         scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */

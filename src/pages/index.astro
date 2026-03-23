@@ -1,7 +1,80 @@
 ---
-import Layout from "../layout/Layout.astro"
+import Layout from "../layout/Layout.astro";
+import PinkBird from "../assets/svg/PinkBird.svg";
+import CardRecette from "../components/CardRecette.astro";
+import CardProfessionnel from "../components/CardProfessionnel.astro";
+import { getRecettes, getProfessionnels } from "../../backend/functions";
+
+const recettes = await getRecettes();
+const recettesSliced = recettes?.slice(0,3);
+
+const professionnels = await getProfessionnels();
+const professionnelsSliced = professionnels?.slice(0,3);
+
+console.log(professionnelsSliced)
 ---
 
-<Layout titre="Ton compagnion nutrition">
-
+<Layout theme="regime" titre="Mon compagnion nutrition" filledFooter="false">
+  <div class="centerflex gap-5 flex-col w-full">
+    <!-- Top -->
+    <div class="relative flex flex-col gap-5 py-10 w-full">
+      <PinkBird class="absolute -z-1 right-0" />
+      <div class="flex flex-col items-start px-5 w-full">
+        <h1 class="font-logo text-5xl">Cookoo,</h1>
+        <p class="font-light text-xl">mon compagnon nutrition</p>
+      </div>
+      <div class="flex w-full justify-end px-5">
+        <div class="btn">
+          <a class="btnText" href="/auth">Connexion</a>
+        </div>
+      </div>
+    </div>
+    <!-- Article -->
+    <article
+      class="centerflex flex-col w-full gap-10 py-10 pb-10 rounded-t-3xl bg-light"
+    >
+      <section class="flex flex-col w-full gap-2 px-5">
+        <h2>Mon régime</h2>
+        <p>
+          Définis tes objectifs, calcule tes besoins et traque tes progrès pour
+          réussir ton régime en un battement d’aile !
+        </p>
+        <div class="flex w-full justify-end">
+          <div class="btn bg-regime-dark">
+            <a class="btnText" href="/regime">Commencer mon régime</a>
+          </div>
+        </div>
+      </section>
+      <section class="flex flex-col w-full gap-2">
+        <h2 class="px-5">Nos dernières recettes</h2>
+        <div class="flex gap-5 w-full px-5 py-2 overflow-x-scroll noscrollbar">
+          {
+            recettesSliced.map((recette) => {
+              return <CardRecette {...recette} />;
+            })
+          }
+        </div>
+        <div class="flex w-full justify-end px-5">
+          <div class="btn bg-recette-dark">
+            <a class="btnText" href="/recettes">Voir toutes les recettes</a>
+          </div>
+        </div>
+      </section>
+      <section class="flex flex-col w-full gap-2 px-5">
+        <h2>Nos professionnels</h2>
+        <div class="flex flex-col gap-5 w-full py-2">
+          {
+            professionnelsSliced.map((professionnel) => {
+              return <CardProfessionnel {...professionnel} />;
+            })
+          }
+        </div>
+        <div class="flex w-full justify-end">
+          <div class="btn bg-pro-dark">
+            <a class="btnText" href="/professionnels">Voir tous les pros</a>
+          </div>
+        </div>
+      </section>
+    </article>
+  </div>
 </Layout>
