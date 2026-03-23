@@ -2,16 +2,50 @@
 import Layout from "../layout/Layout.astro";
 import { getUser } from "../../backend/functions";
 
+export const prerender = false;
+
 let user;
 
 if (Astro.locals.pb.authStore.record) {
   user = await getUser(Astro.locals.pb.authStore.record.id);
   user.email = Astro.locals.pb.authStore.record.email;
 }
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  if (data.has("deconnexion")) {
+    Astro.locals.pb.authStore.clear();
+    Astro.response.headers.append(
+      "set-cookie",
+      Astro.locals.pb.authStore.exportToCookie()
+    );
+    return Astro.redirect("/auth");
+  }
+  try {
+    const name = data.get("name") || user.name as string;
+    const email = data.get("email") || user.email as string;
+    const password = data.get("password") as string;
+    const passwordConfirm = data.get("passwordConfirm") as string;
+    const avatar = data.get("avatar") as File;
+    console.log({name, email, password, passwordConfirm, avatar});
+    await Astro.locals.pb.collection("users").update(user.id, {name, email});
+    if (avatar.size != 0) {
+        await Astro.locals.pb.collection("users").update(user.id, {avatar});
+    }
+    if (password != '' && password == passwordConfirm) {
+        await Astro.locals.pb.collection("users").update(user.id, {password});
+    }
+    return Astro.redirect("/profile");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
 ---
 
-<Layout titre="Mon profil">
-  <div class="centerflex p-5 w-full max-w-100 self-center">
+<Layout titre="Mon profil" theme="">
+  <div class="centerflex flex-col p-5 w-full max-w-100 self-center">
     <div
       class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow)"
     >
@@ -26,7 +60,7 @@ if (Astro.locals.pb.authStore.record) {
                     <p class="text-not-so-dark">{user.email}</p>
                 </div>
             </div>
-            <button class="btn btnText self-end">Modifier mon profil</button>
+            <button id="btn" class="btn btnText self-end">Modifier mon profil</button>
             <div class="w-full">
             <p>Détails :</p>
             <div class="text-sm text-not-so-dark">
@@ -35,6 +69,10 @@ if (Astro.locals.pb.authStore.record) {
                 <p>Admin : <span>{user.admin ? "Oui" : "Non"}</span></p>
             </div>
             </div>
+            <form method="post">
+              <input type="hidden" value="1" name="deconnexion" />
+              <button class="btn btnText">Se déconnecter</button>
+            </form>
           </div>
         ) : (
             <p class="text-center">Impossible d'afficher votre profil car vous n'êtes pas connecté</p>
@@ -53,5 +91,63 @@ if (Astro.locals.pb.authStore.record) {
         )
       }
     </div>
+    { user ? (
+        <div id="form" class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow) hidden">
+            <form class="centerflex flex-col w-full" method="post" enctype="multipart/form-data" submit="prevent">
+                <label class="label">
+              <input type="text" name="name" placeholder="Pseudonyme" value={user.name}/>
+            </label>
+            <label class="label">
+              <input type="email" name="email" placeholder="Email" value={user.email}/>
+            </label>
+            <label class="label">
+              <input
+                type="password"
+                name="password"
+                minlength="5"
+                placeholder="Nouveau mot de passe"
+              />
+            </label>
+            <label class="label">
+              <input
+                type="password"
+                name="passwordConfirm"
+                minlength="5"
+                placeholder="Confimer le nouveau mot de passe"
+              />
+            </label>
+            <label class="label">
+                Avatar
+              <input
+                type="file"
+                name="avatar"
+                accept="image/*"
+              />
+            </label>
+            <button type="submit" class="btn btnText w-full justify-center">Mettre à jour</button>
+            </form>
+        </div>
+    ) : 
+    ('')
+    }
+    
   </div>
+
+  <script>
+    const form = document.getElementById("form") as HTMLFormElement;
+    const btn = document.getElementById("btn") as HTMLButtonElement;
+
+    let opened = false;
+
+    if (form && btn) {
+        btn.addEventListener("click", () => {
+            if (opened) {
+                form.classList.add("hidden");
+            } else {
+                form.classList.remove("hidden");
+            }
+            opened = !opened;
+        })
+    }
+  </script>
 </Layout>

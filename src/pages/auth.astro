@@ -26,6 +26,7 @@ if (Astro.request.method === "POST") {
       Astro.locals.pb.authStore.exportToCookie()
     );
     user = await getUser(Astro.locals.pb.authStore.record.id);
+    return Astro.redirect("/profile");
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
@@ -34,7 +35,7 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<Layout theme="regime" titre="Connexion">
+<Layout theme="" titre="Connexion">
   <div class="centerflex p-5 w-full max-w-100 self-center">
     <div class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow)">
       <h1>Connexion</h1>
