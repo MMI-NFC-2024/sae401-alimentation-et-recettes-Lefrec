@@ -1,0 +1,77 @@
+---
+import Layout from "../layout/Layout.astro";
+import { getUser } from "../../backend/functions";
+
+let user;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+}
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  if (data.has("deconnexion")) {
+    Astro.locals.pb.authStore.clear();
+    Astro.response.headers.append(
+      "set-cookie",
+      Astro.locals.pb.authStore.exportToCookie()
+    );
+  }
+  try {
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
+    await Astro.locals.pb.collection("users").authWithPassword(email, password);
+    Astro.response.headers.append(
+      "set-cookie",
+      Astro.locals.pb.authStore.exportToCookie()
+    );
+    user = await getUser(Astro.locals.pb.authStore.record.id);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout theme="regime" titre="Connexion">
+  <div class="centerflex p-5 w-full max-w-100 self-center">
+    <div class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow)">
+      <h1>Connexion</h1>
+
+      {
+        Astro.locals.pb.authStore.isValid ? (
+          <div class="centerflex flex-col">
+            <div class="centerflex">
+            <img class="size-10 rounded-full object-cover" src={user?.imageURL} alt="Avatar de l'utilisateur">
+            <p>Tu es connecté en tant que <span class="text-gold font-semibold">{user?.name}</span></p>
+            </div>
+            <form method="post">
+              <input type="hidden" value="1" name="deconnexion" />
+              <button class="btn btnText">Se déconnecter</button>
+            </form>
+          </div>
+        ) : (
+          <form class="centerflex flex-col w-full" method="post">
+            <label class="label">
+              <input type="email" name="email" placeholder="Email" />
+            </label>
+            <label class="label">
+              <input
+                type="password"
+                name="password"
+                minlength="5"
+                placeholder="Mot de passe"
+              />
+            </label>
+            <button class="btn btnText w-full justify-center">Se connecter</button>
+          </form>
+          <div class="centerflex justify-around">
+            <p class="text-sm">Vous n'avez pas de compte ?</p>
+            <a class="text-sm text-gold font-semibold" href="/register">Créer un compte</a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,103 @@
+---
+import Layout from "../layout/Layout.astro";
+import { getUser } from "../../backend/functions";
+
+let user;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+}
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  if (data.has("deconnexion")) {
+    Astro.locals.pb.authStore.clear();
+    Astro.response.headers.append(
+      "set-cookie",
+      Astro.locals.pb.authStore.exportToCookie()
+    );
+  }
+  try {
+    const name = data.get("name") as string;
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
+    const passwordConfirm = data.get("passwordConfirm") as string;
+    const avatar = data.get("avatar") as File;
+    await Astro.locals.pb.collection("users").create({name, email, password, passwordConfirm, avatar})
+    await Astro.locals.pb.collection("users").authWithPassword(email, password);
+    Astro.response.headers.append(
+      "set-cookie",
+      Astro.locals.pb.authStore.exportToCookie()
+    );
+    user = await getUser(Astro.locals.pb.authStore.record.id);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout theme="regime" titre="Créer un compte">
+  <div class="centerflex p-5 w-full max-w-100 self-center">
+    <div class="flex flex-col w-full p-5 gap-5 bg-light rounded-3xl shadow-(--base-shadow)">
+      <h1>Créer un compte</h1>
+
+      {
+        Astro.locals.pb.authStore.isValid ? (
+          <div class="centerflex flex-col">
+            <div class="centerflex">
+            <img class="size-10 rounded-full object-cover" src={user.imageURL} alt="Avatar de l'utilisateur">
+            <p>Tu es déjà connecté en tant que <span class="text-gold font-semibold">{user.name}</span></p>
+            </div>
+            <p class="text-center text-sm">Déconnecte toi pour créer un nouveau compte</p>
+            <form method="post">
+              <input type="hidden" value="1" name="deconnexion" />
+              <button class="btn btnText">Se déconnecter</button>
+            </form>
+          </div>
+        ) : (
+          <form class="centerflex flex-col w-full" method="post" enctype="multipart/form-data">
+            <label class="label">
+              <input type="text" name="name" placeholder="Pseudonyme" required/>
+            </label>
+            <label class="label">
+              <input type="email" name="email" placeholder="Email" required/>
+            </label>
+            <label class="label">
+              <input
+                type="password"
+                name="password"
+                minlength="5"
+                placeholder="Mot de passe"
+                required
+              />
+            </label>
+            <label class="label">
+              <input
+                type="password"
+                name="passwordConfirm"
+                minlength="5"
+                placeholder="Confimer le mot de passe"
+                required
+              />
+            </label>
+            <label class="label">
+                Avatar
+              <input
+                type="file"
+                name="avatar"
+                accept="image/*"
+              />
+            </label>
+            <button class="btn btnText w-full justify-center">Créer mon compte</button>
+          </form>
+          <div class="centerflex justify-around">
+            <p class="text-sm">Vous avez déjà un compte ?</p>
+            <a class="text-sm text-gold font-semibold" href="/auth">Se connecter</a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>

@@ -25,44 +25,49 @@
 }
 
 @layer base {
-    h1,h2,h3 {
-        @apply font-heading;
-    }
-    h1 {
-        @apply text-3xl font-medium text-center;
-    }
-    h2 {
-        @apply font-common text-lg font-medium;
-    }
-    h3 {
-        @apply font-common text-base font-semibold text-center;
-    }
-    p {
-        @apply font-common text-base;
-    }
-    input {
-        @apply outline-none;
-    }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+  }
+  h1 {
+    @apply text-3xl font-medium text-center;
+  }
+  h2 {
+    @apply font-common text-lg font-medium;
+  }
+  h3 {
+    @apply font-common text-base font-semibold text-center;
+  }
+  p {
+    @apply font-common text-base;
+  }
+  input {
+    @apply outline-none;
+  }
 }
 
 @layer components {
-    .logo {
-        @apply font-logo text-3xl text-center;
-    }
-    .centerflex {
-        @apply flex justify-center items-center gap-2;
-    }
-    .btn {
-        @apply flex w-fit h-fit p-2.5 rounded-full bg-gold hover:scale-105 transition-transform duration-100 ease-in-out;
-    }
-    .btnText {
-        @apply text-light text-lg font-semibold;
-    }
-    .noscrollbar {
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */
-    }
-    .noscrollbar::-webkit-scrollbar {
-        display: none;  /* Older Safari and Chromium */
-    }
+  .logo {
+    @apply font-logo text-3xl text-center;
+  }
+  .centerflex {
+    @apply flex justify-center items-center gap-2;
+  }
+  .btn {
+    @apply flex w-fit h-fit p-2.5 rounded-full bg-gold hover:scale-105 transition-transform duration-100 ease-in-out;
+  }
+  .btnText {
+    @apply text-light text-lg font-semibold;
+  }
+  .label {
+    @apply border border-not-so-dark rounded-lg p-1 w-full;
+  }
+  .noscrollbar {
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
+  }
+  .noscrollbar::-webkit-scrollbar {
+    display: none; /* Older Safari and Chromium */
+  }
 }

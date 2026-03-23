@@ -1,6 +1,6 @@
 import Pocketbase from 'pocketbase';
-import type { IngredientsResponse, TypedPocketBase, UsersResponse } from '../src/utils/type';
-const pb = new Pocketbase(import.meta.env.PROD ? "http://localhost:8081/" : "https://sae401.paolo-vincent.fr/") as TypedPocketBase;
+import type { TypedPocketBase, UsersResponse } from '../src/utils/type';
+const pb = new Pocketbase("https://sae401.paolo-vincent.fr/") as TypedPocketBase;
 
 
 //Custom types
@@ -56,11 +56,14 @@ export type ProfessionnelsFilter = {
 };
 
 //Main functions
-export async function getUser(id: string) : Promise<UsersResponse | undefined> {
+export async function getUser(id: string) : Promise<Object | undefined> {
     try {
         const user = await pb.collection("users").getOne(id);
+        const imageURL = pb.files.getURL(user, user.avatar);
+
         console.log("[getUser] Got user :",JSON.stringify(user, null, 2));
-        return user;
+
+        return {...user, imageURL};
     } catch (e) {
         console.log("[getUser] Failed to get user :",id,"Caught error :",e);
         return;

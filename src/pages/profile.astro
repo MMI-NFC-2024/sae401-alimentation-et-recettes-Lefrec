@@ -1,0 +1,14 @@
+---
+import Layout from "../layout/Layout.astro";
+import { getUser } from "../../backend/functions";
+
+let user;
+
+if (Astro.locals.pb.authStore.record) {
+  user = await getUser(Astro.locals.pb.authStore.record.id);
+}
+---
+
+<Layout titre=>
+
+</Layout>
