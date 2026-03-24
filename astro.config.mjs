@@ -11,6 +11,10 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
+  security: {
+    checkOrigin: false
+  },
+
   output: 'server',
 
   adapter: node({
