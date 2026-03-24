@@ -22,10 +22,7 @@ jobs:
       run: npm ci
       
     - name: Build project
-      run: | 
-        npm run build
-        cp package.json dist/server/
-        cp package-lock.json dist/server/
+      run: npm run build
 
     - name: Deploy to VPS via SCP
       uses: appleboy/scp-action@v0.1.3
@@ -50,4 +47,6 @@ jobs:
         script: |
           cd /var/www/sae401/server
           npm ci
+          npm install astro
+          npm install send server-destroy
           PORT=8082 pm2 restart cookoo || PORT=8082 pm2 start entry.mjs --name cookoo
